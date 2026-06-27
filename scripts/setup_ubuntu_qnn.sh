@@ -19,7 +19,7 @@ echo "==> [1/4] System packages"
 sudo apt-get update
 sudo apt-get install -y \
   git build-essential gcc-13 g++-13 \
-  python3.10 python3.10-venv python3-pip \
+  python3 python3-venv python3-pip \
   unzip wget curl cmake
 
 echo "==> [2/4] Android NDK r26c"
@@ -40,7 +40,7 @@ fi
 ET_ROOT="$HOME/executorch"
 
 echo "==> [4/4] Python venv"
-python3.10 -m venv "$HOME/et-venv"
+python3 -m venv "$HOME/et-venv"
 # shellcheck disable=SC1091
 source "$HOME/et-venv/bin/activate"
 pip install --upgrade pip
