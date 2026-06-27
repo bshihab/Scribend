@@ -14,3 +14,6 @@ build/
 *.db
 *.db-wal
 *.db-shm
+
+# Generated from the JSON fixture by tools/json_to_tsv.py
+tests/data/*.tsv
