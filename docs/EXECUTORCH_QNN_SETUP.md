@@ -22,6 +22,13 @@ by proving `export → load .pte → run → return` works end-to-end on a Snapd
    (HTP). Verified SoCs: **SM8550, SM8450** (also SM8650). An emulator can only do
    x86 HTP emulation (also Linux-only) — it won't prove real NPU performance.
 
+   **>>> THIS PROJECT'S DEVICE: Samsung Galaxy S25 Ultra <<<**
+   - SoC: **Snapdragon 8 Elite = `SM8750`** → use `-m SM8750` / `QcomChipset.SM8750`
+   - Hexagon NPU version: **V79** → push the `...V79Stub.so` + `hexagon-v79` skel libs
+   - ⚠️ The 8 Elite (SM8750) is very new — confirm `QcomChipset.SM8750` exists in your
+     ExecuTorch + QNN 2.37.0 build. If it's missing, you may need a newer ExecuTorch
+     commit / QNN SDK, or fall back to the CPU (XNNPACK) track for now.
+
 If you don't have a Snapdragon device, do the **CPU (XNNPACK)** track — it still
 proves the whole runtime + JNI + `.pte` pipeline, just without NPU acceleration.
 
@@ -77,7 +84,7 @@ You don't need Dev 2's models — use the bundled example to prove QNN works:
 cd $EXECUTORCH_ROOT
 python -m examples.qualcomm.scripts.deeplab_v3 \
   -b build-android \
-  -m SM8550 \           # <-- match YOUR device's SoC
+  -m SM8750 \           # <-- S25 Ultra (Snapdragon 8 Elite)
   --compile_only \
   --download
 # Output: ./deeplab_v3/dlv3_qnn.pte
@@ -98,7 +105,7 @@ example_inputs = (torch.randn(1, 3, 224, 224),)
 
 backend_options = generate_htp_compiler_spec(use_fp16=True)
 compile_spec = generate_qnn_executorch_compiler_spec(
-    soc_model=QcomChipset.SM8650,        # <-- your SoC
+    soc_model=QcomChipset.SM8750,        # <-- S25 Ultra (Snapdragon 8 Elite)
     backend_options=backend_options,
 )
 delegated = to_edge_transform_and_lower_to_qnn(model, example_inputs, compile_spec)
@@ -114,8 +121,8 @@ adb shell "mkdir -p ${DEVICE_DIR}"
 # Push the QNN runtime libs (HTP stubs + hexagon skels for your device's Hexagon ver)
 adb push ${QNN_SDK_ROOT}/lib/aarch64-android/libQnnHtp.so ${DEVICE_DIR}
 adb push ${QNN_SDK_ROOT}/lib/aarch64-android/libQnnSystem.so ${DEVICE_DIR}
-adb push ${QNN_SDK_ROOT}/lib/aarch64-android/libQnnHtpV75Stub.so ${DEVICE_DIR}   # match HW
-adb push ${QNN_SDK_ROOT}/lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so ${DEVICE_DIR} # match HW
+adb push ${QNN_SDK_ROOT}/lib/aarch64-android/libQnnHtpV79Stub.so ${DEVICE_DIR}   # S25 Ultra = Hexagon V79
+adb push ${QNN_SDK_ROOT}/lib/hexagon-v79/unsigned/libQnnHtpV79Skel.so ${DEVICE_DIR} # S25 Ultra = Hexagon V79
 
 # Push model + runner + backend
 adb push ./deeplab_v3/dlv3_qnn.pte ${DEVICE_DIR}
