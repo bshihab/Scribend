@@ -1,0 +1,16 @@
+# Fetched at build time via tools/fetch_sqlite_amalgamation.sh (large, ~9MB).
+# Not committed — each dev runs the fetch script once.
+vendor/sqlite/
+
+# CMake build trees
+build-host/
+build-android/
+build/
+
+# Python venv for the mock-data tool
+.venv/
+
+# Local test databases
+*.db
+*.db-wal
+*.db-shm
