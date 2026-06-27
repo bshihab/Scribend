@@ -70,15 +70,20 @@ if(M_LIB)
     target_link_libraries(scribend_store PUBLIC ${M_LIB})
 endif()
 
-# --- Host-only smoke test ---------------------------------------------------
-# Built only for a native (non-Android) toolchain, so `ctest` works on a laptop
-# but Gradle's NDK build stays lean.
-if(NOT ANDROID)
-    enable_testing()
+# --- Smoke test -------------------------------------------------------------
+# Builds the test binary on BOTH host and Android. On host it registers with
+# ctest; cross-compiled for Android it's an executable you `adb push` to the
+# phone and run to prove the engine works on real hardware (e.g. Galaxy S25).
+# Dev 1 can pass -DSCRIBEND_BUILD_TESTS=OFF to keep the app's APK lean.
+option(SCRIBEND_BUILD_TESTS "Build the storage smoke test" ON)
+if(SCRIBEND_BUILD_TESTS)
     add_executable(test_store tests/test_store.c)
-    target_link_libraries(test_store PRIVATE scribend_store)
-    add_test(
-        NAME store_smoke
-        COMMAND test_store ${CMAKE_CURRENT_SOURCE_DIR}/schema/schema.sql
-    )
+    target_link_libraries(test_store PRIVATE scribend_store)  # pulls in libm too
+    if(NOT ANDROID)
+        enable_testing()
+        add_test(
+            NAME store_smoke
+            COMMAND test_store ${CMAKE_CURRENT_SOURCE_DIR}/schema/schema.sql
+        )
+    endif()
 endif()
