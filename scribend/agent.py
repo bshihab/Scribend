@@ -35,17 +35,12 @@ class ScribendAgent:
         print("Agent is fully loaded and ready!")
 
     def transcribe_audio(self, audio_path: str) -> str:
-        """Step 1: Convert doctor's voice to text with medical vocabulary hint"""
+        """Step 1: Convert doctor's voice to text"""
         print("\n[1/3] Transcribing audio with Whisper...")
         audio, sr = librosa.load(audio_path, sr=16000)
         input_features = self.whisper_processor(audio, sampling_rate=sr, return_tensors="pt").input_features
         
-        # Feed the medical vocabulary as an initial_prompt to bias Whisper
-        # toward recognizing complex medical terms correctly
-        prompt_ids = self.whisper_processor.get_prompt_ids(
-            MEDICAL_VOCABULARY_PROMPT, return_tensors="pt"
-        )
-        predicted_ids = self.whisper_model.generate(input_features, prompt_ids=prompt_ids)
+        predicted_ids = self.whisper_model.generate(input_features, no_repeat_ngram_size=3)
         transcript = self.whisper_processor.batch_decode(predicted_ids, skip_special_tokens=True)[0].strip()
         print(f"Transcript: \"{transcript}\"")
         return transcript
@@ -72,7 +67,7 @@ class ScribendAgent:
         inputs = self.llama_tokenizer([text], return_tensors="pt").to("mps")
         
         # Generate the JSON output
-        outputs = self.llama_model.generate(**inputs, max_new_tokens=600, temperature=0.1)
+        outputs = self.llama_model.generate(**inputs, max_new_tokens=600, do_sample=False, repetition_penalty=1.15)
         
         # Only decode the NEWly generated tokens (ignore the prompt)
         generated_ids = outputs[0][inputs.input_ids.shape[-1]:]
@@ -98,7 +93,7 @@ class ScribendAgent:
         
         text = self.llama_tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         inputs = self.llama_tokenizer([text], return_tensors="pt").to("mps")
-        outputs = self.llama_model.generate(**inputs, max_new_tokens=800, temperature=0.1)
+        outputs = self.llama_model.generate(**inputs, max_new_tokens=800, do_sample=False, repetition_penalty=1.15)
         
         generated_ids = outputs[0][inputs.input_ids.shape[-1]:]
         markdown = self.llama_tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
