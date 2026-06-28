@@ -17,96 +17,172 @@
 
   <style>
     :root {
-      --scribend-blue: #2f6db5;
-      --scribend-ink: #1f2937;
-      --scribend-muted: #6b7280;
-      --scribend-accent: #4f8edc;
-      --scribend-rule: #111827;
+      /* Deep navy palette (#00008B family), used as accents — not a solid fill */
+      --navy:        #00008B;   /* requested dark blue */
+      --navy-deep:   #00006B;
+      --navy-soft:   #3a3ac0;
+      --ink:         #14142b;   /* near-navy text for elegance */
+      --muted:       #6b7280;
+      --hair:        #e3e3f2;   /* faint navy-tinted hairlines */
+      --paper:       #ffffff;
+      --paper-tint:  #f7f8fd;   /* barely-there navy wash for code/cards */
     }
+
+    /* ---- Elegant, NON-solid background: faint navy dot-grid + corner glow ---- */
+    .reveal .backgrounds { background: var(--paper); }
+    .reveal:after {            /* soft navy radial glows in the corners */
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(820px 520px at 100% 0%,   rgba(0,0,139,0.06), transparent 60%),
+        radial-gradient(720px 520px at 0% 100%,   rgba(0,0,139,0.05), transparent 60%);
+    }
+    .reveal:before {           /* whisper-quiet dot grid for subtle texture */
+      content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: radial-gradient(rgba(0,0,139,0.05) 1px, transparent 1.4px);
+      background-size: 26px 26px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.35));
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0.35));
+    }
+    .reveal .slides { z-index: 1; }
 
     .reveal {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       font-size: 30px;
-      color: var(--scribend-ink);
+      color: var(--ink);
     }
     .reveal .slides section { text-align: left; top: 0 !important; }
 
-    .reveal h1, .reveal h2, .reveal h3 { color: var(--scribend-ink); text-transform: none; font-weight: 700; letter-spacing: -0.01em; }
+    .reveal h1, .reveal h2, .reveal h3 { color: var(--navy); text-transform: none; font-weight: 700; letter-spacing: -0.01em; }
     .reveal h1 { font-size: 1.9em; }
-    .reveal h2 { font-size: 1.5em; }
-    .reveal h3 { font-size: 1.15em; }
-    .reveal .brand { color: var(--scribend-blue); }
-    .reveal a { color: var(--scribend-blue); }
-    .reveal strong { color: var(--scribend-ink); }
-    .reveal em { color: var(--scribend-ink); }
+    .reveal h2 { font-size: 1.42em; margin-bottom: 0.5em; }
+    .reveal h3 { font-size: 1.1em; }
+
+    /* Elegant accent rule under each heading (thin navy gradient, never solid block) */
+    .reveal h2:after {
+      content: ""; display: block; height: 3px; width: 2.4em; margin-top: 0.28em;
+      background: linear-gradient(90deg, var(--navy), rgba(0,0,139,0));
+      border-radius: 3px;
+    }
+
+    .reveal .brand { color: var(--navy); }
+    .reveal a { color: var(--navy); }
+    .reveal strong { color: var(--ink); }
+    .reveal em { color: var(--navy-deep); font-style: italic; }
 
     .reveal ul, .reveal ol { display: block; margin-left: 1.1em; }
-    .reveal li { margin: 0.32em 0; line-height: 1.35; }
+    .reveal li { margin: 0.3em 0; line-height: 1.4; }
+    /* navy bullet markers */
+    .reveal ul { list-style: none; }
+    .reveal ul > li { position: relative; padding-left: 0.2em; }
+    .reveal ul > li:before {
+      content: ""; position: absolute; left: -0.85em; top: 0.62em;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--navy); opacity: 0.85;
+    }
+    .reveal ul ul > li:before { background: transparent; border: 1.5px solid var(--navy); }
 
     /* running header / footer like the original PDF */
     .slide-eyebrow {
-      position: absolute; top: 24px; left: 40px;
-      font-size: 0.55em; color: var(--scribend-muted); letter-spacing: 0.01em;
+      position: absolute; top: 22px; left: 40px; right: 40px;
+      font-size: 0.5em; color: var(--navy); opacity: 0.65; letter-spacing: 0.04em;
+      text-transform: uppercase; font-weight: 700;
+    }
+    .slide-eyebrow:after {
+      content: ""; display: block; margin-top: 8px; height: 1px;
+      background: linear-gradient(90deg, rgba(0,0,139,0.25), rgba(0,0,139,0));
     }
     .slide-footer {
-      position: absolute; bottom: 22px; left: 40px; right: 40px;
-      display: flex; justify-content: space-between;
-      font-size: 0.5em; color: var(--scribend-muted);
+      position: absolute; bottom: 20px; left: 40px; right: 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.46em; color: var(--muted);
+    }
+    .slide-footer:before {
+      content: ""; position: absolute; left: 0; right: 0; top: -10px; height: 1px;
+      background: linear-gradient(90deg, rgba(0,0,139,0), rgba(0,0,139,0.18), rgba(0,0,139,0));
+    }
+    .slide-footer .pg {
+      color: var(--navy); font-weight: 700; opacity: 0.8;
+      border: 1px solid var(--hair); border-radius: 999px; padding: 1px 9px;
     }
 
-    .lead { color: var(--scribend-blue); font-size: 1.05em; font-weight: 600; }
+    .lead { color: var(--navy); font-size: 1.05em; font-weight: 600; }
 
     .callout {
-      border-left: 4px solid #cbd5e1;
-      padding: 0.15em 0 0.15em 0.8em;
-      color: var(--scribend-muted);
-      font-weight: 700;
-      margin: 0.6em 0;
+      border-left: 3px solid var(--navy);
+      background: linear-gradient(90deg, rgba(0,0,139,0.05), rgba(0,0,139,0));
+      padding: 0.28em 0.9em; color: var(--navy-deep);
+      font-weight: 600; margin: 0.6em 0; border-radius: 0 8px 8px 0;
     }
 
     code, .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
     .reveal code:not(.hljs) {
-      background: #f1f3f5; color: var(--scribend-ink);
-      padding: 0.05em 0.35em; border-radius: 5px; font-size: 0.85em;
+      background: var(--paper-tint); color: var(--navy-deep);
+      padding: 0.05em 0.4em; border-radius: 5px; font-size: 0.85em;
+      border: 1px solid var(--hair);
     }
-    .reveal pre { width: 100%; box-shadow: none; font-size: 0.5em; }
+    .reveal pre { width: 100%; box-shadow: 0 6px 22px rgba(0,0,139,0.07); font-size: 0.5em; }
     .reveal pre code {
-      border-radius: 10px; padding: 16px 18px; max-height: none;
-      border: 1px solid #e5e7eb;
+      border-radius: 12px; padding: 16px 18px; max-height: none;
+      border: 1px solid var(--hair);
     }
 
     .ascii {
-      background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 10px;
-      padding: 14px 18px; font-size: 0.42em; line-height: 1.35; white-space: pre;
-      color: var(--scribend-ink);
+      background: var(--paper-tint); border: 1px solid var(--hair); border-radius: 12px;
+      padding: 14px 18px; font-size: 0.4em; line-height: 1.35; white-space: pre;
+      color: var(--ink); box-shadow: 0 6px 22px rgba(0,0,139,0.06);
     }
 
-    table.clean { font-size: 0.62em; border-collapse: collapse; width: 100%; }
-    table.clean th, table.clean td { border: 1px solid #d1d5db; padding: 8px 12px; text-align: left; }
-    table.clean th { background: #f8fafc; }
-    table.clean tr:nth-child(even) td { background: #fafbfc; }
-    .me-row td { font-weight: 700; }
+    table.clean { font-size: 0.6em; border-collapse: collapse; width: 100%;
+      box-shadow: 0 6px 22px rgba(0,0,139,0.06); border-radius: 12px; overflow: hidden; }
+    table.clean th, table.clean td { border: 1px solid var(--hair); padding: 8px 12px; text-align: left; }
+    table.clean th { background: rgba(0,0,139,0.06); color: var(--navy-deep); font-weight: 700; }
+    table.clean tr:nth-child(even) td { background: var(--paper-tint); }
 
-    .ok { color: #2f9e44; font-weight: 700; }
-    .pill { background: #f1f3f5; padding: 0.05em 0.4em; border-radius: 5px; font-size: 0.85em; }
+    .ok { color: #1d8a4e; font-weight: 700; }
 
-    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6em 1.4em; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55em 1em; }
     .card {
-      border: 1px solid #e5e7eb; border-radius: 12px; padding: 0.7em 0.9em;
-      background: #fff;
+      border: 1px solid var(--hair); border-radius: 14px; padding: 0.6em 0.85em;
+      background: var(--paper); position: relative; overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,139,0.05);
     }
-    .card h3 { margin: 0 0 0.2em 0; }
-    .card .who { color: var(--scribend-blue); font-size: 0.7em; font-weight: 700; margin: 0 0 0.35em 0; text-transform: uppercase; letter-spacing: 0.03em; }
-    .card ul { margin: 0 0 0 1em; font-size: 0.72em; }
-    .card.me { border-color: var(--scribend-blue); box-shadow: 0 0 0 2px rgba(47,109,181,0.12); }
+    .card:before {     /* slim navy accent bar on each card — a small elegant design touch */
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      background: linear-gradient(180deg, var(--navy), rgba(0,0,139,0.25));
+    }
+    .card h3 { margin: 0 0 0.15em 0.2em; font-size: 0.92em; }
+    .card .who { color: var(--navy); font-size: 0.62em; font-weight: 700; margin: 0 0 0.3em 0.3em;
+      text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85; }
+    .card ul { margin: 0 0 0 1em; font-size: 0.66em; }
+    .card ul > li { margin: 0.18em 0; }
+    .card ul > li:before { top: 0.5em; width: 5px; height: 5px; }
+    .card.me { border-color: var(--navy); box-shadow: 0 6px 22px rgba(0,0,139,0.14); }
+    .card.me:before { width: 5px; background: var(--navy); }
 
     .reveal .smaller { font-size: 0.8em; }
-    .reveal .tiny { font-size: 0.62em; color: var(--scribend-muted); }
+    .reveal .tiny { font-size: 0.6em; color: var(--muted); }
     .center { text-align: center; }
 
     /* title slide */
-    #title h1 { font-size: 2.4em; }
+    #title { text-align: center; }
+    #title h1 { font-size: 2.5em; margin-bottom: 0.25em; }
+    #title h1:after { display: none; }
+    #title .lead { margin-top: 0.1em; }
+    #title .rule {
+      height: 3px; width: 200px; margin: 0.5em auto 0.7em;
+      background: linear-gradient(90deg, rgba(0,0,139,0), var(--navy), rgba(0,0,139,0));
+      border-radius: 3px;
+    }
     .stethoscope { font-size: 0.9em; }
+
+    /* Thank-you slide centered + elegant */
+    #thanks { text-align: center; }
+    #thanks h1:after { display: none; }
+    #thanks .rule {
+      height: 3px; width: 200px; margin: 0.5em auto 0.7em;
+      background: linear-gradient(90deg, rgba(0,0,139,0), var(--navy), rgba(0,0,139,0));
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body>
@@ -116,7 +192,8 @@
     <!-- 1 · TITLE -->
     <section id="title">
       <h1><span class="stethoscope">🩺</span> <span class="brand">Scribend</span></h1>
-      <p class="lead">An <span class="brand">offline-first</span> AI medical scribe — 100% on-device</p>
+      <div class="rule"></div>
+      <p class="lead">An offline-first AI medical scribe — 100% on-device</p>
       <p>Captures doctor–patient audio → transcribes → retrieves patient history → writes a structured SOAP note.</p>
       <p><strong>No internet. No cloud. HIPAA-safe by design.</strong></p>
       <p><em>Qualcomm × Meta 48-hour Hackathon</em></p>
@@ -125,7 +202,7 @@
         (0:00) Hi, we're Team Scribend. Scribend is an offline-first AI medical scribe that runs entirely on a phone —
         it listens to a doctor–patient conversation and writes a structured SOAP note. No internet, no cloud, HIPAA-safe by design.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>1</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">1</span></div>
     </section>
 
     <!-- 2 · PROBLEM -->
@@ -143,7 +220,7 @@
         and every existing AI scribe ships private patient data to the cloud. So we asked: what if the whole pipeline
         ran on one phone, fully offline?
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>2</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">2</span></div>
     </section>
 
     <!-- 3 · SOLUTION -->
@@ -163,7 +240,7 @@
         Listen, Transcribe with Whisper, Remember relevant history with vector search, and Write a structured SOAP note with Llama.
         Everything on-device — private, fast, works with no signal.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>3</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">3</span></div>
     </section>
 
     <!-- 4 · ARCHITECTURE -->
@@ -190,7 +267,7 @@
         we cosine-search a local sqlite-vec database for relevant past notes; then Llama-3.2-1B takes the transcript plus that history
         and writes the SOAP note as JSON. Every model is INT8-quantized, exported with ExecuTorch, and runs on the Snapdragon NPU.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>4</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">4</span></div>
     </section>
 
     <!-- 5 · MODELS & TOOLING (NEW) -->
@@ -214,7 +291,7 @@
         tiny/base/small and five LLMs (Llama 1B & 3B, Qwen 1.5B & 3B, SmolLM2) for accuracy versus on-device speed. Whisper-small.en
         and Llama-3.2-1B won. Everything is exported and quantized with ExecuTorch into .pte files.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>5</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">5</span></div>
     </section>
 
     <!-- 6 · MY ROLE -->
@@ -229,7 +306,7 @@
         and build cosine-similarity search over patient history that's fast and leak-free. The stack is SQLite plus sqlite-vec,
         cross-compiled with the Android NDK for arm64-v8a.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>6</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">6</span></div>
     </section>
 
     <!-- 7 · WHY VECTOR SEARCH -->
@@ -248,7 +325,7 @@
         So "find relevant notes" becomes "find the closest vectors" — matched by meaning, not keywords. We measure with cosine distance:
         0 is identical meaning, 1 is unrelated.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>7</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">7</span></div>
     </section>
 
     <!-- 8 · DATABASE DESIGN -->
@@ -270,7 +347,7 @@
         chunk_text returns the original note alongside the hit, and patient_id is a partition key — so search is fast AND
         one patient's data is physically isolated from another's. Plain SQL tables back the patients, encounters, and vitals.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>8</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">8</span></div>
     </section>
 
     <!-- 9 · IT WORKS -->
@@ -293,7 +370,7 @@
         asthma pairs with a spirometry result, diabetes with a glucose reading — none of which share keywords.
         Respiratory, cardiac, diabetic and sleep notes self-organize. Validated on real embeddings, not just random noise.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>9</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">9</span></div>
     </section>
 
     <!-- 10 · PROVEN ON HARDWARE -->
@@ -311,7 +388,7 @@ ALL PASSED</code></pre>
         It opens the DB, applies the schema, inserts 384-dim vectors, runs cosine KNN, and enforces patient isolation —
         all passed. Verified on-device, no memory leaks, sub-millisecond search.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>10</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">10</span></div>
     </section>
 
     <!-- 11 · ENGINEERING HIGHLIGHTS -->
@@ -329,7 +406,7 @@ ALL PASSED</code></pre>
         no runtime downloads. A clean C API means teammates never touch SQLite. One CMake config builds for both laptop and phone.
         And it's tested at every level — unit, Python, a 5k-vector stress test, and the on-device run.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>11</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">11</span></div>
     </section>
 
     <!-- 12 · WHAT EACH DEVELOPER BUILT (NEW) -->
@@ -383,7 +460,7 @@ ALL PASSED</code></pre>
         UI and the demo data. On Saturday night the "Big Swap" dropped real vectors, models, and JNI in place of the fillers, and because
         our interfaces were pre-agreed, the app just came to life.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>12</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">12</span></div>
     </section>
 
     <!-- 13 · HOW WE BUILT IT FAST (NEW) -->
@@ -401,7 +478,7 @@ ALL PASSED</code></pre>
         autocomplete across C, Python, and Kotlin. Net effect: four developers moved like eight, so we spent our time on real model
         evaluation and on-device validation instead of plumbing.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>13</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">13</span></div>
     </section>
 
     <!-- 14 · ROADMAP -->
@@ -418,12 +495,13 @@ ALL PASSED</code></pre>
         (5:00 approaching) Next steps: finish swapping in real MiniLM embeddings, wire the C API fully into JNI, connect the Compose UI,
         and benchmark at clinic scale — tens of thousands of notes.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>14</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">14</span></div>
     </section>
 
     <!-- 15 · THANK YOU -->
-    <section>
+    <section id="thanks">
       <h1 class="brand">Thank You 🙏</h1>
+      <div class="rule"></div>
       <p><strong>Scribend — private, offline, on-device medical AI</strong></p>
       <p><strong>The memory layer:</strong> a vector search engine that runs on the phone in your pocket.</p>
       <p><em>Questions?</em></p>
@@ -431,7 +509,7 @@ ALL PASSED</code></pre>
         (5:00) To wrap: Scribend is private, offline, on-device medical AI — and the memory layer is a real vector search engine
         running on the phone in your pocket. Thank you — happy to take questions.
       </aside>
-      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>15</span></div>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span class="pg">15</span></div>
     </section>
 
   </div>
@@ -449,7 +527,7 @@ ALL PASSED</code></pre>
     transition: 'slide',
     width: 1280,
     height: 720,
-    margin: 0.06,
+    margin: 0.07,
     // 5-minute talk: the speaker-view timer turns green when you're on pace.
     defaultTiming: 20,            // ~20s/slide × 15 slides ≈ 5 min
     totalTime: 300,               // hard 5:00 budget shown in speaker view
