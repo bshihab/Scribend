@@ -20,7 +20,7 @@ export const PermissionsScreen = ({navigation}: ScribendScreenProps<'Permissions
 
   const requestPermissions = async () => {
     if (Platform.OS !== 'android') {
-      navigation.navigate('Home');
+      navigation.navigate('HomeTabs');
       return;
     }
 
@@ -28,7 +28,7 @@ export const PermissionsScreen = ({navigation}: ScribendScreenProps<'Permissions
     if (result === PermissionsAndroid.RESULTS.GRANTED) {
       setMicrophoneStatus('Granted');
       setErrorMessage(undefined);
-      navigation.navigate('Home');
+      navigation.navigate('HomeTabs');
     } else {
       setMicrophoneStatus('Denied');
       setErrorMessage(ScribendCopy.PERMISSION_ERROR);
@@ -59,7 +59,7 @@ export const PermissionsScreen = ({navigation}: ScribendScreenProps<'Permissions
       <PrimaryButton label={ScribendCopy.CONTINUE} onPress={requestPermissions} />
       <SecondaryButton label={ScribendCopy.OPEN_SETTINGS} onPress={() => Linking.openSettings()} />
       {errorMessage ? (
-        <SecondaryButton label={ScribendCopy.CONTINUE} onPress={() => navigation.navigate('Home')} />
+        <SecondaryButton label={ScribendCopy.CONTINUE} onPress={() => navigation.navigate('HomeTabs')} />
       ) : null}
     </AppScreen>
   );

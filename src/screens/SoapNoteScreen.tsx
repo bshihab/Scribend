@@ -9,7 +9,7 @@ import {SecondaryButton} from '../components/SecondaryButton';
 import {SoapSectionCard} from '../components/SoapSectionCard';
 import {StatusBadge} from '../components/StatusBadge';
 import {ScribendCopy} from '../copy/ScribendCopy';
-import {SoapAssessmentIcon, SoapObjectiveIcon, SoapPlanIcon, SoapSubjectiveIcon} from '../icons/ScribendIcons';
+import {IconBadge} from '../components/IconBadge';
 import type {ScribendScreenProps} from '../models/Navigation';
 import {fallbackSoapNote} from '../models/SoapNote';
 import {useVisitStore} from '../store/VisitStore';
@@ -49,7 +49,7 @@ export const SoapNoteScreen = ({navigation, route}: ScribendScreenProps<'SoapNot
       <RetrievedContextCard context={currentVisit.retrievedContext?.summary} />
       <SoapSectionCard
         label={ScribendCopy.SUBJECTIVE}
-        icon={<SoapSubjectiveIcon />}
+        icon={<IconBadge symbol="S" size={36} />}
         content={note.subjective}
         accentColor={colors.primaryBlue}
         editable={editable && !locked}
@@ -57,7 +57,7 @@ export const SoapNoteScreen = ({navigation, route}: ScribendScreenProps<'SoapNot
       />
       <SoapSectionCard
         label={ScribendCopy.OBJECTIVE}
-        icon={<SoapObjectiveIcon />}
+        icon={<IconBadge symbol="O" size={36} />}
         content={note.objective}
         accentColor={colors.teal}
         editable={editable && !locked}
@@ -65,7 +65,7 @@ export const SoapNoteScreen = ({navigation, route}: ScribendScreenProps<'SoapNot
       />
       <SoapSectionCard
         label={ScribendCopy.ASSESSMENT}
-        icon={<SoapAssessmentIcon />}
+        icon={<IconBadge symbol="A" size={36} />}
         content={note.assessment}
         accentColor={colors.warning}
         editable={editable && !locked}
@@ -73,7 +73,7 @@ export const SoapNoteScreen = ({navigation, route}: ScribendScreenProps<'SoapNot
       />
       <SoapSectionCard
         label={ScribendCopy.PLAN}
-        icon={<SoapPlanIcon />}
+        icon={<IconBadge symbol="P" size={36} />}
         content={note.plan}
         accentColor={colors.cyan}
         editable={editable && !locked}

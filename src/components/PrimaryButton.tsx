@@ -32,14 +32,14 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primaryBlue,
+    backgroundColor: colors.greenPrimary,
     overflow: 'hidden',
     paddingHorizontal: spacing.lg,
   },
   innerHighlight: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.teal,
-    opacity: 0.13,
+    backgroundColor: colors.white,
+    opacity: 0.08,
   },
   disabled: {
     opacity: 0.42,

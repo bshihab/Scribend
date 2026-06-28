@@ -44,10 +44,34 @@ export const PatientStoreProvider = ({children}: {children: React.ReactNode}) =>
         fullName: input.fullName.trim(),
         age: Number(input.age),
         gender: input.gender,
+        mrn: makeLocalId('mrn').toUpperCase(),
+        status: ScribendCopy.NEW_PATIENT,
         lastVisitDate: ScribendCopy.NEW_PATIENT,
         primaryCondition: input.primaryCondition.trim() || ScribendCopy.NOT_SPECIFIED,
+        notePreview: ScribendCopy.NEW_PATIENT_NOTE_PREVIEW,
         currentMedications: input.currentMedications.trim() || ScribendCopy.NONE_LISTED,
         allergies: input.allergies.trim() || ScribendCopy.NO_KNOWN_ALLERGIES,
+        medications: [
+          {
+            name: input.currentMedications.trim() || ScribendCopy.NONE_LISTED,
+            dosage: '',
+            schedule: ScribendCopy.REVIEW_AT_VISIT,
+          },
+        ],
+        vitals: [
+          {label: 'BP', value: '--', unit: 'mmHg'},
+          {label: 'HR', value: '--', unit: 'bpm'},
+          {label: 'SpO2', value: '--', unit: '%'},
+          {label: 'Weight', value: '--', unit: 'lbs'},
+        ],
+        recentNotes: [{date: ScribendCopy.NEW_PATIENT, preview: ScribendCopy.NEW_PATIENT_NOTE_PREVIEW}],
+        recentActivity: [
+          {
+            date: ScribendCopy.NEW_PATIENT,
+            title: ScribendCopy.INTAKE_CREATED,
+            description: ScribendCopy.LOCAL_RECORD_CREATED,
+          },
+        ],
       };
       setPatients(current => [...current, patient]);
       return {ok: true as const, patient};

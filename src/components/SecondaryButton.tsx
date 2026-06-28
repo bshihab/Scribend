@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.glassBorder,
-    backgroundColor: colors.glassSubtle,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,

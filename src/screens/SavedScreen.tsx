@@ -6,7 +6,7 @@ import {GlassCard} from '../components/GlassCard';
 import {PrimaryButton} from '../components/PrimaryButton';
 import {SecondaryButton} from '../components/SecondaryButton';
 import {ScribendCopy} from '../copy/ScribendCopy';
-import {CheckSuccessIcon} from '../icons/ScribendIcons';
+import {IconBadge} from '../components/IconBadge';
 import type {ScribendScreenProps} from '../models/Navigation';
 import {genderLabel} from '../models/Patient';
 import {useVisitStore} from '../store/VisitStore';
@@ -26,7 +26,7 @@ export const SavedScreen = ({navigation, route}: ScribendScreenProps<'Saved'>) =
   return (
     <AppScreen>
       <View style={styles.success}>
-        <CheckSuccessIcon size={68} />
+        <IconBadge symbol="✓" size={68} />
       </View>
       <AppText variant="headline" color={colors.textPrimary}>
         {ScribendCopy.SAVED_SUCCESS_TITLE}

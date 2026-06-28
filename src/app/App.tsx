@@ -8,7 +8,7 @@ import {colors} from '../theme/colors';
 
 const App = () => (
   <SafeAreaProvider>
-    <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+    <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
     <PatientStoreProvider>
       <VisitStoreProvider>
         <ScribendNavigator />

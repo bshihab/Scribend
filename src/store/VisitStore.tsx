@@ -11,6 +11,7 @@ interface VisitStoreValue {
   currentVisit: VisitSession;
   savedVisits: SavedVisitNote[];
   startVisit: (patient: Patient) => void;
+  prepareSoapDraft: (patient: Patient) => string;
   startRecording: () => void;
   stopRecording: () => Promise<string | undefined>;
   retryProcessing: () => Promise<string | undefined>;
@@ -52,6 +53,33 @@ export const VisitStoreProvider = ({children}: {children: React.ReactNode}) => {
       stopTimer();
       timerSecondsRef.current = 0;
       setCurrentVisit({status: 'Idle', timerSeconds: 0, patient});
+    };
+
+    const prepareSoapDraft = (patient: Patient) => {
+      stopTimer();
+      timerSecondsRef.current = 0;
+      const visitId = makeLocalId('visit');
+      setCurrentVisit({
+        id: visitId,
+        status: 'Complete',
+        timerSeconds: 0,
+        patient,
+        transcript: {
+          patientId: patient.id,
+          content: ScribendCopy.MOCK_TRANSCRIPT,
+        },
+        retrievedContext: {
+          patientId: patient.id,
+          summary: ScribendCopy.MOCK_CONTEXT,
+        },
+        soapNote: {
+          subjective: patient.recentNotes[0]?.preview ?? ScribendCopy.MOCK_TRANSCRIPT,
+          objective: patient.vitals.map(vital => `${vital.label}: ${vital.value} ${vital.unit ?? ''}`.trim()).join('\n'),
+          assessment: `${patient.primaryCondition}. Patient is ${patient.status.toLowerCase()} with no urgent local alerts.`,
+          plan: 'Continue current care plan, review medications, and follow up after the next visit.',
+        },
+      });
+      return visitId;
     };
 
     const startRecording = () => {
@@ -206,6 +234,7 @@ export const VisitStoreProvider = ({children}: {children: React.ReactNode}) => {
       currentVisit,
       savedVisits,
       startVisit,
+      prepareSoapDraft,
       startRecording,
       stopRecording,
       retryProcessing,

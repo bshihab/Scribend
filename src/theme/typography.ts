@@ -1,4 +1,6 @@
 export const typography = {
+  fontFamily: undefined as string | undefined,
+  roundedFontFamily: undefined as string | undefined,
   display: {fontSize: 32, lineHeight: 38, fontWeight: '700' as const},
   headline: {fontSize: 28, lineHeight: 34, fontWeight: '700' as const},
   title: {fontSize: 21, lineHeight: 27, fontWeight: '700' as const},

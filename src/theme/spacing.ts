@@ -9,6 +9,6 @@ export const spacing = {
   screen: 20,
   screenCompact: 16,
   screenWide: 24,
-  bottomSafe: 32,
-  touchTarget: 48,
+  bottomSafe: 120,
+  touchTarget: 56,
 };

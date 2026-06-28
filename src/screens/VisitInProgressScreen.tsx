@@ -2,14 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {Alert, Pressable, StyleSheet, useWindowDimensions, View} from 'react-native';
 import {AppScreen} from '../components/AppScreen';
 import {AppText} from '../components/AppText';
-import {AppTopBar} from '../components/AppTopBar';
+import {IconBadge} from '../components/IconBadge';
+import {NavigationButton} from '../components/NavigationButton';
 import {ErrorState} from '../components/ErrorState';
 import {GlassCard} from '../components/GlassCard';
 import {PrimaryButton} from '../components/PrimaryButton';
 import {SecondaryButton} from '../components/SecondaryButton';
 import {VisitProgressStepper} from '../components/VisitProgressStepper';
 import {ScribendCopy} from '../copy/ScribendCopy';
-import {MicrophoneIcon} from '../icons/ScribendIcons';
 import type {ScribendScreenProps} from '../models/Navigation';
 import {genderLabel} from '../models/Patient';
 import {usePatientStore} from '../store/PatientStore';
@@ -93,7 +93,7 @@ export const VisitInProgressScreen = ({navigation, route}: ScribendScreenProps<'
 
   return (
     <AppScreen>
-      <AppTopBar title={ScribendCopy.VISIT_IN_PROGRESS} onBack={() => (isActive ? discard() : navigation.goBack())} />
+      <NavigationButton label="Back" direction="back" onPress={() => (isActive ? discard() : navigation.goBack())} variant="secondary" style={styles.backButton} />
       <GlassCard style={styles.patientCard}>
         <View style={styles.patientHeader}>
           <View style={styles.patientCopy}>
@@ -114,7 +114,7 @@ export const VisitInProgressScreen = ({navigation, route}: ScribendScreenProps<'
         accessibilityLabel={ScribendCopy.MICROPHONE_ACCESS}
         onPress={() => (currentVisit.status === 'Recording' ? stopAndNavigate() : startRecording())}
         style={[styles.micButton, {width: micSize, height: micSize}]}>
-        <MicrophoneIcon size={Math.round(micSize * 0.48)} color={currentVisit.status === 'Recording' ? colors.error : colors.teal} />
+        <IconBadge symbol="●" size={Math.round(micSize * 0.58)} backgroundColor={currentVisit.status === 'Recording' ? '#F8D8D8' : colors.softGreen} color={currentVisit.status === 'Recording' ? colors.error : colors.darkGreen} />
       </Pressable>
       <GlassCard compact style={styles.timerCard}>
         <AppText variant="headline" color={colors.textPrimary}>
@@ -167,6 +167,9 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.glassBorder,
     backgroundColor: colors.glassStrong,
+  },
+  backButton: {
+    alignSelf: 'flex-start',
   },
   patientCard: {
     backgroundColor: colors.glassSubtle,

@@ -16,7 +16,8 @@ export const AppText = ({variant = 'body', color = colors.textSecondary, style, 
 
 const styles = StyleSheet.create({
   base: {
-    letterSpacing: -0.1,
+    fontFamily: typography.roundedFontFamily,
+    letterSpacing: 0,
     includeFontPadding: false,
   },
 });

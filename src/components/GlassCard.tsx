@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.glass,
     borderColor: colors.glassBorder,
     borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radius.xl,
+    borderRadius: radius.lg,
     padding: spacing.lg,
     overflow: 'hidden',
     ...(shadows.glass as object),
