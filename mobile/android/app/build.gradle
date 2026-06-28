@@ -1,0 +1,71 @@
+plugins {
+    id("com.android.application")
+    id("com.facebook.react")
+}
+
+def jscFlavor = 'org.webkit:android-jsc:+'
+
+react {
+    autolinkLibrariesWithApp()
+    //
+    // Added by install-expo-modules
+    entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", rootDir.getAbsoluteFile().getParentFile().getAbsolutePath(), "android", "absolute"].execute(null, rootDir).text.trim())
+    cliFile = new File(["node", "--print", "require.resolve('@expo/cli')"].execute(null, rootDir).text.trim())
+    bundleCommand = "export:embed"
+}
+
+android {
+    namespace "com.scribend"
+    compileSdk 35
+    ndkVersion rootProject.ext.ndkVersion
+
+    defaultConfig {
+        applicationId "com.scribend"
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName "1.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('scribend.keystore')
+            storePassword 'scribend'
+            keyAlias 'scribend'
+            keyPassword 'scribend'
+        }
+    }
+
+    buildTypes {
+        release {
+            // Self-contained APK: embeds the JS bundle, signed for sideloading.
+            // (Hackathon keystore — fine for a demo; not for store release.)
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+
+    packaging {
+        jniLibs {
+            // executorch and react-native both ship some of the same .so files;
+            // take the first to avoid "2 files found with path .../libX.so" merge errors.
+            pickFirsts += [
+                "**/libjsi.so",
+                "**/libc++_shared.so",
+                "**/libfbjni.so",
+                "**/libreactnative.so",
+                "**/libhermes.so",
+            ]
+        }
+    }
+}
+
+dependencies {
+    implementation("com.facebook.react:react-android")
+
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        implementation jscFlavor
+    }
+}

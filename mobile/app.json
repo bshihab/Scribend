@@ -1,0 +1,7 @@
+{
+  "name": "Scribend",
+  "displayName": "Scribend",
+  "plugins": [
+    "expo-asset"
+  ]
+}
