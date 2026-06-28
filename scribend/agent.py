@@ -21,8 +21,8 @@ class ScribendAgent:
         print("Initializing Scribend Agent (Loading Models...)")
         
         # Load Whisper
-        self.whisper_processor = WhisperProcessor.from_pretrained("openai/whisper-tiny.en")
-        self.whisper_model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny.en")
+        self.whisper_processor = WhisperProcessor.from_pretrained("openai/whisper-small.en")
+        self.whisper_model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-small.en")
         
         # Load Llama (Optimized for Mac GPU)
         self.llama_model_name = "meta-llama/Llama-3.2-3B-Instruct"
