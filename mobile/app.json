@@ -1,4 +1,7 @@
 {
   "name": "Scribend",
-  "displayName": "Scribend"
+  "displayName": "Scribend",
+  "plugins": [
+    "expo-asset"
+  ]
 }

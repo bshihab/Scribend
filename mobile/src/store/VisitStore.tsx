@@ -97,7 +97,15 @@ export const VisitStoreProvider = ({children}: {children: React.ReactNode}) => {
         }));
 
         setStatus('ExtractingHistory');
-        const context = await aiBridge.retrievePatientContext(snapshot.patient.id, transcript);
+        // The on-device vector retrieval (sqlite-vec) isn't wired into the RN
+        // app yet, so retrievePatientContext returns ''. Until it is, fall back
+        // to the patient's stored record so the SOAP note still gets real prior
+        // context (and the "Retrieved Patient Context" panel isn't empty).
+        let context = await aiBridge.retrievePatientContext(snapshot.patient.id, transcript);
+        if (!context || !context.trim()) {
+          const p = snapshot.patient;
+          context = `Prior history (from patient record): ${p.primaryCondition}. Current medications: ${p.currentMedications}. Allergies: ${p.allergies}. Last visit: ${p.lastVisitDate}.`;
+        }
         setCurrentVisit(current => ({
           ...current,
           retrievedContext: {patientId: snapshot.patient!.id, summary: context},

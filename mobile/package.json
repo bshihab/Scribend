@@ -13,6 +13,8 @@
     "@react-navigation/native": "6.1.18",
     "@react-navigation/native-stack": "6.11.0",
     "expo": "~53.0.0",
+    "expo-asset": "~11.1.7",
+    "expo-constants": "~17.1.8",
     "react": "18.3.1",
     "react-native": "0.76.5",
     "react-native-audio-api": "^0.6.1",

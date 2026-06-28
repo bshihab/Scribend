@@ -4,10 +4,10 @@
 // - retrievePatientContext is a stub (sqlite-vec not wired into RN yet).
 import {
   LLMModule,
-  // tiny Whisper + 1B Llama: executorch stages model data through the JS heap on
-  // load, so the heavier combos (3B / small Whisper) exhaust memory and crash
-  // when both are resident. This ~1.5GB pair runs the full pipeline reliably.
-  // The prompt fix (one-shot example + no-echo rule) keeps 1B's notes clean.
+  // 1B Llama (cached, no download). Reliable at the 4-field SOAP structure when
+  // the transcript is SHORT — long transcripts make 1B ramble everything into
+  // "subjective". Keep visit recordings concise. Swap to LLAMA3_2_3B_QLORA for
+  // better accuracy + structure at any length (costs a ~2.5GB download).
   LLAMA3_2_1B_QLORA,
   SpeechToTextModule,
   WHISPER_TINY_EN,
@@ -98,24 +98,153 @@ export class ExecutorchAIBridge implements ScribendAIBridge {
       {role: 'user', content: userContent},
     ];
     const response = await this.llm.generate(messages);
+    console.log(`[Scribend] Llama raw SOAP response: ${response}`);
     return parseSoap(response, transcript);
   }
 }
 
-function parseSoap(response: string, transcript: string): SoapNote {
-  try {
-    const match = response.match(/\{[\s\S]*\}/);
-    if (!match) {
-      return fallbackSoapNote(transcript);
+// Coerce any JSON value (string / array / nested object) to readable text.
+// Fixes the "[object Object]" bug when the model returns a nested plan/section.
+function coerce(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) {
+    return value.map(coerce).filter(Boolean).join('; ');
+  }
+  if (typeof value === 'object') {
+    return Object.values(value as Record<string, unknown>)
+      .map(coerce)
+      .filter(Boolean)
+      .join('; ');
+  }
+  return '';
+}
+
+// Find the first balanced {...} block (brace/string aware). Returns a partial
+// fragment (first "{" to end) if the model truncated before closing — so we can
+// still salvage it below.
+function extractObjectText(text: string): string | null {
+  const start = text.indexOf('{');
+  if (start < 0) return null;
+  let depth = 0;
+  let inStr = false;
+  let esc = false;
+  for (let i = start; i < text.length; i++) {
+    const c = text[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === '\\') esc = true;
+      else if (c === '"') inStr = false;
+    } else if (c === '"') inStr = true;
+    else if (c === '{') depth++;
+    else if (c === '}') {
+      depth--;
+      if (depth === 0) return text.slice(start, i + 1);
     }
-    const obj = JSON.parse(match[0]);
-    return {
-      subjective: String(obj.subjective ?? '').trim(),
-      objective: String(obj.objective ?? '').trim(),
-      assessment: String(obj.assessment ?? '').trim(),
-      plan: String(obj.plan ?? '').trim(),
+  }
+  return text.slice(start); // truncated — salvage the fragment
+}
+
+// Pull a single field's string value straight out of the raw text, tolerating
+// malformed JSON (this is what saves us when JSON.parse fails on 1B output).
+function extractField(text: string, key: string): string {
+  const re = new RegExp(`"${key}[a-z]*"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"`, 'i');
+  const m = text.match(re);
+  return m ? coerce(m[1].replace(/\\"/g, '"').replace(/\\n/g, ' ')) : '';
+}
+
+// Get a key from a parsed object case-insensitively (subjective/Subjective/subj…).
+function pick(obj: Record<string, unknown>, prefix: string): string {
+  const k = Object.keys(obj).find(kk => kk.toLowerCase().startsWith(prefix));
+  return k ? coerce(obj[k]) : '';
+}
+
+// --- Deterministic safety net -------------------------------------------------
+// The 1B model often leaves "subjective"/"objective" blank even when the
+// transcript clearly contains them (it fills assessment/plan and drops the
+// rest). When that happens we reconstruct those fields straight from the
+// transcript so the SOAP note is never half-empty.
+
+function vitalsFromTranscript(t: string): string {
+  const out: string[] = [];
+  const bp = t.match(/blood pressure[^.]*?(\d{2,3})\s*(?:over|\/)\s*(\d{2,3})/i);
+  if (bp) out.push(`Blood pressure ${bp[1]}/${bp[2]} mmHg`);
+  const hr = t.match(/heart rate[^.]*?(\d{2,3})/i);
+  if (hr) out.push(`Heart rate ${hr[1]} bpm`);
+  const temp = t.match(/temperature[^.]*?(\d{2,3}(?:\.\d)?)/i);
+  if (temp) out.push(`Temperature ${temp[1]}`);
+  const spo2 = t.match(/(?:spo2|oxygen|o2 sat|saturation)[^.]*?(\d{2,3})\s*%?/i);
+  if (spo2) out.push(`SpO2 ${spo2[1]}%`);
+  const wt = t.match(/weight[^.]*?(\d{1,3}(?:\.\d)?)\s*(kg|kilograms?|pounds?|lbs)/i);
+  if (wt) out.push(`Weight ${wt[1]} ${wt[2]}`);
+  return out.join('. ');
+}
+
+function symptomsFromTranscript(t: string): string {
+  const sentences = t
+    .split(/(?<=[.!?])\s+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+  const symptom = /(report|complain|feel|pain|headache|dizz|naus|cough|fever|tired|fatigue|symptom|ache|sore|breath|history|swelling|weeks?|days?)/i;
+  const isVital = /(blood pressure|heart rate|temperature|spo2|oxygen|saturation|weight|on exam|exam[, ])/i;
+  const isPlan = /(plan|start|restart|prescrib|follow.?up|order|increase|reduce|return in|schedule)/i;
+  const picked = sentences.filter(s => symptom.test(s) && !isVital.test(s) && !isPlan.test(s));
+  return picked.join(' ');
+}
+
+function parseSoap(response: string, transcript: string): SoapNote {
+  // Strip markdown fences / leading prose the small model sometimes adds.
+  const cleaned = String(response ?? '').replace(/```(?:json)?/gi, '').trim();
+  const block = extractObjectText(cleaned);
+
+  // 1) Try strict JSON parse — including a salvage pass for truncated output.
+  let obj: Record<string, unknown> | null = null;
+  if (block) {
+    for (const candidate of [block, block + '"}', block + '"}}', block + '}', block + '}}']) {
+      try {
+        const parsed = JSON.parse(candidate);
+        if (parsed && typeof parsed === 'object') {
+          obj = parsed as Record<string, unknown>;
+          break;
+        }
+      } catch {
+        // try next salvage candidate
+      }
+    }
+  }
+
+  let note: SoapNote;
+  if (obj) {
+    note = {
+      subjective: pick(obj, 'subj'),
+      objective: pick(obj, 'obj'),
+      assessment: pick(obj, 'assess'),
+      plan: pick(obj, 'plan'),
     };
-  } catch {
+  } else {
+    // 2) JSON failed entirely — regex each field out of the raw text.
+    const src = block ?? cleaned;
+    note = {
+      subjective: extractField(src, 'subj'),
+      objective: extractField(src, 'obj'),
+      assessment: extractField(src, 'assess'),
+      plan: extractField(src, 'plan'),
+    };
+  }
+
+  // Safety net: backfill blank subjective/objective from the transcript so the
+  // note is never half-empty when the small model drops those fields.
+  if (!note.subjective.trim()) {
+    note.subjective = symptomsFromTranscript(transcript);
+  }
+  if (!note.objective.trim()) {
+    note.objective = vitalsFromTranscript(transcript);
+  }
+
+  // If we recovered nothing usable at all, fall back to the transcript.
+  if (![note.subjective, note.objective, note.assessment, note.plan].some(v => v.trim())) {
     return fallbackSoapNote(transcript);
   }
+  return note;
 }
