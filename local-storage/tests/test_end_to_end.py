@@ -17,7 +17,7 @@
 #   python tests/test_end_to_end.py
 # =============================================================================
 import os
-import sqlite3
+import sqlean as sqlite3
 import struct
 import sys
 
