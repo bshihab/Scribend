@@ -13,6 +13,16 @@ __pycache__/
 venv/
 .venv/
 .env
+scribend-env/
+
+# Model binaries — too large for git, share via Drive/LFS
+*.pte
+*.onnx
+*.bin
+*.safetensors
+
+# Large generated data files
+dev3_sample_vectors.json
 
 # IDEs
 .idea/
@@ -22,3 +32,5 @@ venv/
 *.njsproj
 *.sln
 *.sw?
+dev3_final_test.json
+*.wav
