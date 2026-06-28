@@ -1,0 +1,22 @@
+#!/bin/sh
+
+APP_HOME=$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)
+APP_NAME="Gradle"
+JAR="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+
+if [ -z "$GRADLE_USER_HOME" ]; then
+  export GRADLE_USER_HOME="$APP_HOME/.gradle"
+fi
+
+if [ -n "$JAVA_HOME" ]; then
+  JAVACMD="$JAVA_HOME/bin/java"
+else
+  JAVACMD=$(command -v java)
+fi
+
+if [ ! -x "$JAVACMD" ]; then
+  echo "ERROR: JAVA_HOME is not set and no java command could be found in PATH." >&2
+  exit 1
+fi
+
+exec "$JAVACMD" "-Dorg.gradle.appname=$APP_NAME" -classpath "$JAR" org.gradle.wrapper.GradleWrapperMain "$@"

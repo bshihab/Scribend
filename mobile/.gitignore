@@ -1,0 +1,44 @@
+# macOS
+.DS_Store
+
+# Node/npm
+node_modules/
+.npm
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+.env
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Android/Gradle
+.gradle/
+build/
+app/build/
+local.properties
+captures/
+*.apk
+*.aab
+
+# Local Android / React Native
+node_modules/
+android/local.properties
+android/.gradle/
+android/build/
+android/app/build/
+*.log
+.DS_Store
+.env
+.env.*
