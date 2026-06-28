@@ -12,8 +12,8 @@ source "$(cd "$(dirname "$0")" && pwd)/env.sh"
 cd "$EXECUTORCH_ROOT"
 echo "--- exporting deeplab_v3 -> QNN .pte for SM8750 (compile only, no device needed) ---"
 python -m examples.qualcomm.scripts.deeplab_v3 \
-  -b build-android \
-  -m SM8750 \
+  --build_folder build-android \
+  --soc_model SM8750 \
   --compile_only \
   --download
 
