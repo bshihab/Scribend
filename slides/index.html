@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scribend — Offline Medical Scribe</title>
+
+  <!--
+    Self-contained reveal.js deck (loaded from CDN).
+    Open slides/index.html in a browser, or serve the repo and visit /slides/.
+    Press 'S' for speaker notes + the 5-minute timer.
+    Press 'E' to enter print/PDF mode, then print to PDF.
+  -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+
+  <style>
+    :root {
+      --scribend-blue: #2f6db5;
+      --scribend-ink: #1f2937;
+      --scribend-muted: #6b7280;
+      --scribend-accent: #4f8edc;
+      --scribend-rule: #111827;
+    }
+
+    .reveal {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 30px;
+      color: var(--scribend-ink);
+    }
+    .reveal .slides section { text-align: left; top: 0 !important; }
+
+    .reveal h1, .reveal h2, .reveal h3 { color: var(--scribend-ink); text-transform: none; font-weight: 700; letter-spacing: -0.01em; }
+    .reveal h1 { font-size: 1.9em; }
+    .reveal h2 { font-size: 1.5em; }
+    .reveal h3 { font-size: 1.15em; }
+    .reveal .brand { color: var(--scribend-blue); }
+    .reveal a { color: var(--scribend-blue); }
+    .reveal strong { color: var(--scribend-ink); }
+    .reveal em { color: var(--scribend-ink); }
+
+    .reveal ul, .reveal ol { display: block; margin-left: 1.1em; }
+    .reveal li { margin: 0.32em 0; line-height: 1.35; }
+
+    /* running header / footer like the original PDF */
+    .slide-eyebrow {
+      position: absolute; top: 24px; left: 40px;
+      font-size: 0.55em; color: var(--scribend-muted); letter-spacing: 0.01em;
+    }
+    .slide-footer {
+      position: absolute; bottom: 22px; left: 40px; right: 40px;
+      display: flex; justify-content: space-between;
+      font-size: 0.5em; color: var(--scribend-muted);
+    }
+
+    .lead { color: var(--scribend-blue); font-size: 1.05em; font-weight: 600; }
+
+    .callout {
+      border-left: 4px solid #cbd5e1;
+      padding: 0.15em 0 0.15em 0.8em;
+      color: var(--scribend-muted);
+      font-weight: 700;
+      margin: 0.6em 0;
+    }
+
+    code, .mono { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    .reveal code:not(.hljs) {
+      background: #f1f3f5; color: var(--scribend-ink);
+      padding: 0.05em 0.35em; border-radius: 5px; font-size: 0.85em;
+    }
+    .reveal pre { width: 100%; box-shadow: none; font-size: 0.5em; }
+    .reveal pre code {
+      border-radius: 10px; padding: 16px 18px; max-height: none;
+      border: 1px solid #e5e7eb;
+    }
+
+    .ascii {
+      background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 10px;
+      padding: 14px 18px; font-size: 0.42em; line-height: 1.35; white-space: pre;
+      color: var(--scribend-ink);
+    }
+
+    table.clean { font-size: 0.62em; border-collapse: collapse; width: 100%; }
+    table.clean th, table.clean td { border: 1px solid #d1d5db; padding: 8px 12px; text-align: left; }
+    table.clean th { background: #f8fafc; }
+    table.clean tr:nth-child(even) td { background: #fafbfc; }
+    .me-row td { font-weight: 700; }
+
+    .ok { color: #2f9e44; font-weight: 700; }
+    .pill { background: #f1f3f5; padding: 0.05em 0.4em; border-radius: 5px; font-size: 0.85em; }
+
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6em 1.4em; }
+    .card {
+      border: 1px solid #e5e7eb; border-radius: 12px; padding: 0.7em 0.9em;
+      background: #fff;
+    }
+    .card h3 { margin: 0 0 0.2em 0; }
+    .card .who { color: var(--scribend-blue); font-size: 0.7em; font-weight: 700; margin: 0 0 0.35em 0; text-transform: uppercase; letter-spacing: 0.03em; }
+    .card ul { margin: 0 0 0 1em; font-size: 0.72em; }
+    .card.me { border-color: var(--scribend-blue); box-shadow: 0 0 0 2px rgba(47,109,181,0.12); }
+
+    .reveal .smaller { font-size: 0.8em; }
+    .reveal .tiny { font-size: 0.62em; color: var(--scribend-muted); }
+    .center { text-align: center; }
+
+    /* title slide */
+    #title h1 { font-size: 2.4em; }
+    .stethoscope { font-size: 0.9em; }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- 1 · TITLE -->
+    <section id="title">
+      <h1><span class="stethoscope">🩺</span> <span class="brand">Scribend</span></h1>
+      <p class="lead">An <span class="brand">offline-first</span> AI medical scribe — 100% on-device</p>
+      <p>Captures doctor–patient audio → transcribes → retrieves patient history → writes a structured SOAP note.</p>
+      <p><strong>No internet. No cloud. HIPAA-safe by design.</strong></p>
+      <p><em>Qualcomm × Meta 48-hour Hackathon</em></p>
+      <aside class="notes">
+        ⏱️ 5-minute pitch — keep moving, ~20–25s per slide.
+        (0:00) Hi, we're Team Scribend. Scribend is an offline-first AI medical scribe that runs entirely on a phone —
+        it listens to a doctor–patient conversation and writes a structured SOAP note. No internet, no cloud, HIPAA-safe by design.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>1</span></div>
+    </section>
+
+    <!-- 2 · PROBLEM -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>The Problem</h2>
+      <ul>
+        <li>Healthcare workers in <strong>remote areas</strong> have <strong>zero reliable Wi-Fi</strong>.</li>
+        <li>Clinical note-taking steals time from patient care.</li>
+        <li>Existing AI scribes send sensitive data <strong>to the cloud</strong> — a privacy &amp; compliance risk.</li>
+      </ul>
+      <p class="callout">What if the entire AI pipeline ran on a single phone, fully offline?</p>
+      <aside class="notes">
+        (0:25) The problem: clinics in remote areas have no reliable internet, note-taking eats into care time,
+        and every existing AI scribe ships private patient data to the cloud. So we asked: what if the whole pipeline
+        ran on one phone, fully offline?
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>2</span></div>
+    </section>
+
+    <!-- 3 · SOLUTION -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>The Solution: Scribend</h2>
+      <p>A medical scribe that runs <strong>entirely on a Snapdragon phone</strong>:</p>
+      <ol>
+        <li>🎙️ <strong>Listen</strong> — capture messy room audio</li>
+        <li>📝 <strong>Transcribe</strong> — speech → text (Whisper)</li>
+        <li>🧠 <strong>Remember</strong> — find relevant past notes (vector search)</li>
+        <li>📋 <strong>Write</strong> — structured SOAP note as JSON (Llama)</li>
+      </ol>
+      <p>All on-device → <strong>private, fast, works with no signal.</strong></p>
+      <aside class="notes">
+        (0:50) Our answer is a four-stage pipeline that lives entirely on a Snapdragon phone:
+        Listen, Transcribe with Whisper, Remember relevant history with vector search, and Write a structured SOAP note with Llama.
+        Everything on-device — private, fast, works with no signal.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>3</span></div>
+    </section>
+
+    <!-- 4 · ARCHITECTURE -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>On-Device Architecture</h2>
+      <div class="ascii">🎙️ Audio
+ │   Whisper-small.en  (speech → text)
+ ▼
+📄 Transcript ──▶ MiniLM (text → 384-dim vector)
+ │                       │
+ │                       ▼
+ │            🗄️  LOCAL VECTOR DB  (sqlite-vec)
+ │               cosine search of past patient notes
+ │                       │
+ ▼                       ▼
+🧠 Llama-3.2-1B  ◀── transcript + retrieved history
+ │
+ ▼
+📋 JSON SOAP Note</div>
+      <p class="smaller">All models quantized to <strong>INT8</strong>, exported with <strong>ExecuTorch</strong>, and run on the <strong>Snapdragon NPU</strong>.</p>
+      <aside class="notes">
+        (1:15) Architecturally: audio goes into Whisper for transcription; the transcript is embedded by MiniLM into a 384-dim vector;
+        we cosine-search a local sqlite-vec database for relevant past notes; then Llama-3.2-1B takes the transcript plus that history
+        and writes the SOAP note as JSON. Every model is INT8-quantized, exported with ExecuTorch, and runs on the Snapdragon NPU.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>4</span></div>
+    </section>
+
+    <!-- 5 · MODELS & TOOLING (NEW) -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>Models &amp; Tooling — How We Chose</h2>
+      <ul>
+        <li>🐝 <strong>Hugging Face</strong> for the LLMs &amp; embedder — pulled <code>Llama-3.2</code>, <code>Qwen</code>, <code>SmolLM2</code> &amp; <code>all-MiniLM-L6-v2</code>.</li>
+        <li>🧩 <strong>Qualcomm AI Hub</strong> to source our <strong>Whisper</strong> model, pre-optimized for the Snapdragon NPU.</li>
+        <li>🔬 <strong>Experimented across many models to test accuracy</strong> — see <code>model_evaluation/</code>:
+          <ul class="smaller">
+            <li><strong>Speech:</strong> Whisper <code>tiny</code> vs <code>base</code> vs <code>small</code> → <strong>small.en</strong> won on accuracy-vs-speed.</li>
+            <li><strong>SOAP notes:</strong> Llama 1B/3B, Qwen 1.5B/3B, SmolLM2 1.7B → <strong>Llama-3.2-1B</strong> best fit on-device.</li>
+          </ul>
+        </li>
+        <li>⚙️ <strong>ExecuTorch</strong> (PyTorch Edge) to quantize → <code>.pte</code> and run on-device.</li>
+      </ul>
+      <aside class="notes">
+        (1:40) On tooling: we pulled the LLMs and the MiniLM embedder from Hugging Face, and we sourced our Whisper model from the
+        Qualcomm AI Hub already optimized for the NPU. We didn't guess at models — our model_evaluation folder benchmarks Whisper
+        tiny/base/small and five LLMs (Llama 1B & 3B, Qwen 1.5B & 3B, SmolLM2) for accuracy versus on-device speed. Whisper-small.en
+        and Llama-3.2-1B won. Everything is exported and quantized with ExecuTorch into .pte files.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>5</span></div>
+    </section>
+
+    <!-- 6 · MY ROLE -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>My Role — Developer 3: Local Storage</h2>
+      <p class="callout">The on-device "memory" of the app.</p>
+      <p><strong>Mission:</strong> compile a vector database for Android, design the schema, and build cosine-similarity search over patient history — <strong>fast, and leak-free.</strong></p>
+      <p><strong>Tech:</strong> <strong>SQLite + sqlite-vec</strong>, compiled with the <strong>Android NDK</strong> for <code>arm64-v8a</code>.</p>
+      <aside class="notes">
+        (2:05) My piece is the memory layer — Developer 3. My mission: compile a vector database for Android, design the schema,
+        and build cosine-similarity search over patient history that's fast and leak-free. The stack is SQLite plus sqlite-vec,
+        cross-compiled with the Android NDK for arm64-v8a.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>6</span></div>
+    </section>
+
+    <!-- 7 · WHY VECTOR SEARCH -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>Why Vector Search?</h2>
+      <ul>
+        <li>An AI model turns a sentence into <strong>384 numbers</strong> (an <em>embedding</em>).</li>
+        <li>Similar <strong>meaning</strong> → similar numbers.</li>
+        <li>"Find relevant notes" becomes <strong>"find the closest vectors"</strong> — by <em>meaning</em>, not keywords.</li>
+      </ul>
+      <p><strong>Cosine distance</strong> measures the angle between vectors:</p>
+      <p><code>0.0 = same meaning</code> … <code>1.0 = unrelated</code></p>
+      <aside class="notes">
+        (2:25) Quick why-vector-search: an embedding model turns a sentence into 384 numbers, and similar meaning gives similar numbers.
+        So "find relevant notes" becomes "find the closest vectors" — matched by meaning, not keywords. We measure with cosine distance:
+        0 is identical meaning, 1 is unrelated.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>7</span></div>
+    </section>
+
+    <!-- 8 · DATABASE DESIGN -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>The Database Design</h2>
+      <pre><code class="language-sql" data-trim data-noescape>CREATE VIRTUAL TABLE patient_vectors USING vec0(
+    patient_id   INTEGER PARTITION KEY,   -- search scoped per patient
+    encounter_id INTEGER,                 -- links a hit to its visit
+    embedding    FLOAT[384] distance_metric=cosine,
+    +chunk_text  TEXT                     -- original note, returned with the hit
+);</code></pre>
+      <ul class="smaller">
+        <li>Plain SQL tables for <code>patients</code>, <code>encounters</code>, <code>vitals</code></li>
+        <li><strong>Partition key</strong> → fast <em>and</em> keeps patients isolated (privacy)</li>
+      </ul>
+      <aside class="notes">
+        (2:50) Here's the core schema — a vec0 virtual table holding 384-dim cosine embeddings. Two things to notice:
+        chunk_text returns the original note alongside the hit, and patient_id is a partition key — so search is fast AND
+        one patient's data is physically isolated from another's. Plain SQL tables back the patients, encounters, and vitals.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>8</span></div>
+    </section>
+
+    <!-- 9 · IT WORKS -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>It Works — Real Embeddings, Real Clustering</h2>
+      <p class="smaller"><strong>20 real MiniLM vectors</strong> (from Dev 2's model) — search groups them by <em>meaning</em>, with <strong>no shared keywords</strong>:</p>
+      <table class="clean">
+        <thead><tr><th>Patient note</th><th>Nearest note by meaning</th><th>dist</th></tr></thead>
+        <tbody>
+          <tr><td>history of asthma, on Albuterol</td><td>Spirometry: obstructive pattern</td><td>0.55</td></tr>
+          <tr><td>BP elevated 150/95</td><td>LDL cholesterol 160 mg/dL</td><td>0.63</td></tr>
+          <tr><td>Metformin for Type 2 Diabetes</td><td>fasting glucose 145 mg/dL</td><td>0.67</td></tr>
+          <tr><td>anxious, trouble sleeping</td><td>Zolpidem for insomnia</td><td>0.49</td></tr>
+        </tbody>
+      </table>
+      <p class="smaller">→ Respiratory, cardiac, diabetic &amp; sleep notes <strong>self-organize</strong> — validated on real embeddings.</p>
+      <aside class="notes">
+        (3:15) And it works on real data. With 20 real MiniLM vectors, the search clusters notes purely by meaning —
+        asthma pairs with a spirometry result, diabetes with a glucose reading — none of which share keywords.
+        Respiratory, cardiac, diabetic and sleep notes self-organize. Validated on real embeddings, not just random noise.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>9</span></div>
+    </section>
+
+    <!-- 10 · PROVEN ON HARDWARE -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>Proven on Real Hardware 📱</h2>
+      <p class="smaller">Ran natively on the <strong>Galaxy S25 Ultra</strong> (Snapdragon 8 Elite, <code>arm64-v8a</code>, Android 15):</p>
+      <pre><code class="language-text" data-trim>RUNNING ON: samsung SM-S938U1 · arm64-v8a · Android 15
+✓ open DB   ✓ apply schema   ✓ insert 384-dim vectors
+✓ cosine KNN (nearest = 0.000000)   ✓ patient isolation
+ALL PASSED</code></pre>
+      <p class="smaller"><span class="ok">✅</span> Verified on-device · <span class="ok">✅</span> No memory leaks · <span class="ok">✅</span> Sub-millisecond search</p>
+      <aside class="notes">
+        (3:40) This isn't a simulator. We ran it natively on a Galaxy S25 Ultra — Snapdragon 8 Elite, Android 15.
+        It opens the DB, applies the schema, inserts 384-dim vectors, runs cosine KNN, and enforces patient isolation —
+        all passed. Verified on-device, no memory leaks, sub-millisecond search.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>10</span></div>
+    </section>
+
+    <!-- 11 · ENGINEERING HIGHLIGHTS -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>Engineering Highlights</h2>
+      <ul class="smaller">
+        <li><strong>Self-contained &amp; offline:</strong> vendored sqlite-vec + SQLite, statically linked → no runtime downloads.</li>
+        <li><strong>Clean C API</strong> (<code>open / insert / search / close</code>) → teammates integrate without touching SQLite.</li>
+        <li><strong>Built for both</strong> laptop (fast tests) <strong>and</strong> phone (NDK cross-compile) from one CMake config.</li>
+        <li><strong>Tested at every level:</strong> C unit test, Python suite, 5k-vector stress, on-device run.</li>
+      </ul>
+      <aside class="notes">
+        (4:00) Engineering highlights for the memory layer: everything's vendored and statically linked, so it's fully offline —
+        no runtime downloads. A clean C API means teammates never touch SQLite. One CMake config builds for both laptop and phone.
+        And it's tested at every level — unit, Python, a 5k-vector stress test, and the on-device run.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>11</span></div>
+    </section>
+
+    <!-- 12 · WHAT EACH DEVELOPER BUILT (NEW) -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>What Each Developer Built</h2>
+      <p class="tiny">"No-Waiting" strategy — everyone coded against fillers (stubs), then integrated at the "Big Swap".</p>
+      <div class="grid2">
+        <div class="card">
+          <h3>Dev 1 — Execution &amp; NDK Lead</h3>
+          <p class="who">JNI + NPU runtime</p>
+          <ul>
+            <li>JNI bridge + Qualcomm <strong>QNN</strong> delegate</li>
+            <li>C++ <strong>ExecuTorch</strong> runtime wiring</li>
+            <li><em>Filler:</em> hardcoded C++ stub strings</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Dev 2 — Python Pipeline &amp; Logic</h3>
+          <p class="who">Models → .pte + prompt</p>
+          <ul>
+            <li>Quantized Whisper, MiniLM, Llama → <code>.pte</code></li>
+            <li>Designed the SOAP-note system prompt</li>
+            <li><em>Filler:</em> fake patient-history text</li>
+          </ul>
+        </div>
+        <div class="card me">
+          <h3>Dev 3 — Local Storage (me)</h3>
+          <p class="who">Vector DB + search</p>
+          <ul>
+            <li>Compiled <strong>sqlite-vec</strong> for the NDK</li>
+            <li>Schema + cosine-KNN, patient-isolated</li>
+            <li><em>Filler:</em> random 384-dim vectors</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Dev 4 — Frontend &amp; Product</h3>
+          <p class="who">UI + demo data</p>
+          <ul>
+            <li><strong>Jetpack Compose</strong> app + record/SOAP UI</li>
+            <li>Faker mock patients + the pitch/docs</li>
+            <li><em>Filler:</em> hardcoded Kotlin UI states</li>
+          </ul>
+        </div>
+      </div>
+      <p class="tiny"><strong>The Big Swap:</strong> real vectors, models &amp; JNI replaced the fillers — pre-agreed interfaces meant it just worked.</p>
+      <aside class="notes">
+        (4:25) Four of us built in parallel using a "no-waiting" strategy — each coded against a filler stub, then we integrated.
+        Dev 1 owned the JNI bridge, the Qualcomm QNN delegate, and the C++ ExecuTorch runtime. Dev 2 quantized the models into .pte
+        and wrote the SOAP-note prompt. I — Dev 3 — built the sqlite-vec vector DB and cosine search. Dev 4 built the Jetpack Compose
+        UI and the demo data. On Saturday night the "Big Swap" dropped real vectors, models, and JNI in place of the fillers, and because
+        our interfaces were pre-agreed, the app just came to life.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>12</span></div>
+    </section>
+
+    <!-- 13 · HOW WE BUILT IT FAST (NEW) -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>How We Shipped in 48 Hours 🤖</h2>
+      <ul>
+        <li>🧠 <strong>Claude Opus 4.5</strong> — paired on the hard parts: NDK cross-compile, sqlite-vec C API, and debugging on-device crashes.</li>
+        <li>🐙 <strong>GitHub Copilot</strong> — in-editor autocomplete and boilerplate across C, Python &amp; Kotlin.</li>
+        <li>⚡ Result: 4 devs moved like 8 — more time for <strong>real model evaluation</strong> and <strong>on-device validation</strong>, less on plumbing.</li>
+      </ul>
+      <aside class="notes">
+        (4:45) We also leaned hard on AI to ship in 48 hours: we paired with Claude Opus 4.5 on the genuinely hard parts —
+        the NDK cross-compile, the sqlite-vec C API, and debugging on-device crashes — and used GitHub Copilot for in-editor
+        autocomplete across C, Python, and Kotlin. Net effect: four developers moved like eight, so we spent our time on real model
+        evaluation and on-device validation instead of plumbing.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>13</span></div>
+    </section>
+
+    <!-- 14 · ROADMAP -->
+    <section>
+      <div class="slide-eyebrow">Scribend — Offline Medical Scribe</div>
+      <h2>Roadmap / Next Steps</h2>
+      <ul>
+        <li>🔌 Swap random vectors for <strong>real MiniLM embeddings</strong> (Dev 2)</li>
+        <li>🔗 Wire the C API into the <strong>JNI layer</strong> (Dev 1)</li>
+        <li>🖥️ Connect to the <strong>Compose UI</strong> (Dev 4)</li>
+        <li>📈 Benchmark at clinic scale (tens of thousands of notes)</li>
+      </ul>
+      <aside class="notes">
+        (5:00 approaching) Next steps: finish swapping in real MiniLM embeddings, wire the C API fully into JNI, connect the Compose UI,
+        and benchmark at clinic scale — tens of thousands of notes.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>14</span></div>
+    </section>
+
+    <!-- 15 · THANK YOU -->
+    <section>
+      <h1 class="brand">Thank You 🙏</h1>
+      <p><strong>Scribend — private, offline, on-device medical AI</strong></p>
+      <p><strong>The memory layer:</strong> a vector search engine that runs on the phone in your pocket.</p>
+      <p><em>Questions?</em></p>
+      <aside class="notes">
+        (5:00) To wrap: Scribend is private, offline, on-device medical AI — and the memory layer is a real vector search engine
+        running on the phone in your pocket. Thank you — happy to take questions.
+      </aside>
+      <div class="slide-footer"><span>Qualcomm × Meta Hackathon · Team Scribend</span><span>15</span></div>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: false,
+    controls: true,
+    progress: true,
+    transition: 'slide',
+    width: 1280,
+    height: 720,
+    margin: 0.06,
+    // 5-minute talk: the speaker-view timer turns green when you're on pace.
+    defaultTiming: 20,            // ~20s/slide × 15 slides ≈ 5 min
+    totalTime: 300,               // hard 5:00 budget shown in speaker view
+    plugins: [ RevealNotes, RevealHighlight ]
+  });
+</script>
+</body>
+</html>
