@@ -31,6 +31,11 @@ val BlueA = Color(0xFF2F6BFF); val Blue2 = Color(0xFF4D8BFF); val TextC = Color(
 val Muted = Color(0xFF8A97B8); val Good = Color(0xFF1FB574); val Line = Color(0xFF243154)
 val RecRed = Color(0xFFE5484D)
 
+// Real output from Dev 2's whisper-small.en, run on model_evaluation/test_medical.wav
+const val WHISPER_TRANSCRIPT =
+    "Patient presents with a three-day history of severe headaches. " +
+    "Blood pressure is 152 over 96. Will prescribe Lisinopril 10mg once a day."
+
 data class Patient(
     val id: Int, val name: String, val initials: String, val age: Int, val sex: String,
     val mrn: String, val lastVisit: String, val condition: String,
@@ -255,13 +260,23 @@ fun RecordTab() {
 }
 
 @Composable fun SoapResult(patient: Patient?, onSave: () -> Unit, onDelete: () -> Unit) = Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-    Text("SOAP Note", color = TextC, fontSize = 17.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
+    Text("Visit Result", color = TextC, fontSize = 17.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp))
     Text("${patient?.name ?: ""} · ${patient?.info ?: ""}", color = Muted, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
     Spacer(Modifier.height(8.dp))
-    SoapCard("S — Subjective", patient?.soapS ?: "—")
-    SoapCard("O — Objective", patient?.soapO ?: "—")
-    SoapCard("A — Assessment", patient?.soapA ?: "—")
-    SoapCard("P — Plan", patient?.soapP ?: "—")
+    // REAL Whisper transcript (Dev 2's whisper-small.en)
+    Text("🎙  Transcript", color = Blue2, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(vertical = 4.dp))
+    Card {
+        Text("real · openai/whisper-small.en (Dev 2)", color = Good, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(4.dp))
+        Text(WHISPER_TRANSCRIPT, color = TextC, fontSize = 13.sp)
+    }
+    Spacer(Modifier.height(6.dp))
+    // SOAP structured from the transcript (Llama generates this at integration — stub)
+    Text("🧠  SOAP Note (auto-structured · Llama stub)", color = Blue2, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(vertical = 4.dp))
+    SoapCard("S — Subjective", "Patient presents with a three-day history of severe headaches.")
+    SoapCard("O — Objective", "Blood pressure 152/96 mmHg.")
+    SoapCard("A — Assessment", "Hypertension with associated headache.")
+    SoapCard("P — Plan", "Prescribe Lisinopril 10mg once daily.")
     Spacer(Modifier.height(10.dp))
     PrimaryButton("✓  Save Note & Finish", onSave)
     DeleteButton("🗑  Delete Note", onDelete)
@@ -313,13 +328,11 @@ fun PatientsTab() {
     Spacer(Modifier.height(8.dp))
     Text("Transcription", color = Blue2, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(vertical = 4.dp))
     Card {
-        Text("🎙  Whisper transcription (Dev 2)", color = Muted, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+        Text("🎙  whisper-small.en (Dev 2) · real output", color = Good, fontSize = 11.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(6.dp))
-        Text(
-            if (p.transcript.isNotBlank()) p.transcript
-            else "⏳ Placeholder — the raw audio transcript will appear here once Dev 2's on-device Whisper model is integrated at the Big Swap.",
-            color = TextC, fontSize = 13.sp
-        )
+        Text(if (p.transcript.isNotBlank()) p.transcript else WHISPER_TRANSCRIPT, color = TextC, fontSize = 13.sp)
+        Spacer(Modifier.height(6.dp))
+        Text("(Demo sample. On-device live transcription pending Dev 1's runtime.)", color = Muted, fontSize = 11.sp)
     }
     Spacer(Modifier.height(12.dp))
 }
