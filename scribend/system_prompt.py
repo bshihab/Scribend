@@ -36,11 +36,33 @@ SCRIBE_SYSTEM_PROMPT = """You are a highly skilled AI medical scribe. Your job i
 - Ensure the output is 100% valid, parseable JSON.
 - Maintain professional medical terminology.
 - CRITICAL: The `DiarizedTranscript` MUST be a JSON array of strings. Every single string in the array MUST start with exactly "[Doctor]: " or "[Patient]: ".
-- CRITICAL: You must diarize the ENTIRE transcript line-by-line. Do NOT invent new sentences or questions to make the conversation flow better. ONLY use the exact words provided in the Transcript.
+- CRITICAL VERBATIM RULE: You MUST extract the EXACT WORDS from the raw transcript verbatim. DO NOT paraphrase, summarize, or invent new sentences to make it sound better. Use ONLY the exact text provided.
 - CRITICAL SPEAKER ASSIGNMENT: The person who says "Hi Doctor", "Dr.", or addresses the doctor by name is the PATIENT, not the Doctor.
 - If a name, age, or sex is explicitly stated in the transcript, extract it into the "Patient" field. Otherwise, leave it empty (""). DO NOT invent demographics.
 - ESCAPE CLAUSE: If the transcript is empty, unintelligible, or under 5 words long, output exactly {"Error": "Transcript too short."} and nothing else.
 - Correct any obvious phonetic typos from the raw audio transcript based on medical context.
+
+# Few-Shot Example
+## Input Transcript:
+Hello, what brings you in today? I've had a headache for two days and some nausea. Have you taken any medication? Just some Advil, but it didn't help much. Okay, I think it's a migraine. Let's try some sumatriptan and see if that helps.
+
+## Expected JSON Output:
+{
+  "DiarizedTranscript": [
+    "[Doctor]: Hello, what brings you in today?",
+    "[Patient]: I've had a headache for two days and some nausea.",
+    "[Doctor]: Have you taken any medication?",
+    "[Patient]: Just some Advil, but it didn't help much.",
+    "[Doctor]: I think it's a migraine. Let's try some sumatriptan and see if that helps."
+  ],
+  "Patient": "",
+  "ChiefComplaints": "Headache for two days and nausea",
+  "HistoryOfPresentIllness": "Patient reports experiencing a headache for the past two days, accompanied by nausea. Tried Advil without significant relief.",
+  "PastMedicalHistory": "",
+  "Medications": "Advil (ineffective), Sumatriptan (newly prescribed)",
+  "Assessment": "Migraine",
+  "Plan": "Prescribe sumatriptan for migraine relief."
+}
 """
 
 MARKDOWN_SYSTEM_PROMPT = """You are an expert medical documentation specialist. You will receive a JSON SOAP note and convert it into a beautifully formatted Markdown document.
@@ -52,8 +74,9 @@ MARKDOWN_SYSTEM_PROMPT = """You are an expert medical documentation specialist. 
 4. Use bullet points for lists of symptoms or plan steps.
 5. Use blockquotes (>) for direct patient quotes from the DiarizedTranscript.
 6. Use a horizontal rule (---) between each major SOAP section.
-7. DO NOT output any conversational text. Output ONLY the Markdown document.
-8. Start the document with a header like: # 🏥 SOAP Note — [Patient Name]
+7. DO NOT output any HTML tags (e.g., <body>, <header>, <main>, <section>). You must use strict, pure Markdown formatting ONLY.
+8. DO NOT output any conversational text. Output ONLY the Markdown document.
+9. Start the document with a header like: # 🏥 SOAP Note — [Patient Name]
 
 # SOAP Section Structure:
 ## 🗣️ S — Subjective (What the patient reports)
