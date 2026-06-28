@@ -262,7 +262,8 @@ fun ScribendApp() {
             }
             if (chosen != null) {
                 Spacer(Modifier.height(12.dp))
-                Text("Top-3 retrieved for: \"$chosen\"", color = Blue2, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                Text("📋 Retrieved from live DB (top 3) for: \"$chosen\"",
+                    color = Blue2, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 results.forEachIndexed { i, (dist, txt) ->
                     Card {
                         Text("#${i + 1}  ·  cosine distance ${"%.4f".format(dist)}",
@@ -270,6 +271,16 @@ fun ScribendApp() {
                         Spacer(Modifier.height(4.dp))
                         Text(txt, color = TextC, fontSize = 13.sp)
                     }
+                }
+                if (results.isNotEmpty()) {
+                    Spacer(Modifier.height(14.dp))
+                    Text("🧠 SOAP Note (organized from the retrieved history)",
+                        color = Blue2, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                    SoapCard("S — Subjective", "Doctor query: \"$chosen\". Most relevant history: ${results[0].second}")
+                    SoapCard("O — Objective",
+                        if (results.size > 1) results.drop(1).joinToString("  •  ") { it.second } else "—")
+                    SoapCard("A — Assessment", "Based on retrieved patient history (closest match above).")
+                    SoapCard("P — Plan", "Final plan generated on-device by Llama-3.2 at integration (stub for now).")
                 }
             }
         }
