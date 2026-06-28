@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base theme: no action bar, dark status bar to match the Compose UI. -->
+    <style name="Theme.Scribend" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#0A0E1A</item>
+        <item name="android:navigationBarColor">#0A0E1A</item>
+        <item name="android:windowBackground">#0A0E1A</item>
+    </style>
+</resources>
