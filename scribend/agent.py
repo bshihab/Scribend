@@ -25,7 +25,7 @@ class ScribendAgent:
         self.whisper_model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny.en")
         
         # Load Llama (Optimized for Mac GPU)
-        self.llama_model_name = "meta-llama/Llama-3.2-3B-Instruct"
+        self.llama_model_name = "meta-llama/Meta-Llama-3-8B-Instruct"
         self.llama_tokenizer = AutoTokenizer.from_pretrained(self.llama_model_name)
         self.llama_model = AutoModelForCausalLM.from_pretrained(
             self.llama_model_name, 
