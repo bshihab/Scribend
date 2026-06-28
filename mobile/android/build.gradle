@@ -7,6 +7,12 @@ buildscript {
         ndkVersion = "28.0.13004108"
         kotlinVersion = "1.9.24"
     }
+    dependencies {
+        // Makes `apply plugin: "com.facebook.react"` resolvable for native modules
+        // that use the legacy apply form (e.g. react-native-executorch). The
+        // settings `includeBuild` substitutes this to the bundled RN gradle plugin.
+        classpath("com.facebook.react:react-native-gradle-plugin")
+    }
 }
 
 plugins {
