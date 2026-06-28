@@ -11,7 +11,8 @@ WORK=/workspaces
 echo "==> [1/5] System packages"
 sudo apt-get update -qq
 sudo apt-get install -y git build-essential gcc-13 g++-13 \
-  python3 python3-venv python3-pip unzip wget curl cmake
+  python3 python3-venv python3-pip unzip wget curl cmake \
+  libc++1 libc++abi1
 
 echo "==> [2/5] Android NDK r26c -> $WORK/android-ndk-r26c"
 cd "$WORK"
