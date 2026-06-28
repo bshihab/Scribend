@@ -1,6 +1,6 @@
 import {NativeModules} from 'react-native';
 import type {SoapNote} from '../models/SoapNote';
-import type {ScribendAIBridge} from './ScribendAIBridge';
+import type {AudioWaveform, ScribendAIBridge} from './ScribendAIBridge';
 
 const {ScribendNativeModule} = NativeModules;
 
@@ -12,9 +12,9 @@ export class NativeScribendAIBridge implements ScribendAIBridge {
     return ScribendNativeModule;
   }
 
-  async transcribeAudio(audioPath: string): Promise<string> {
+  async transcribeAudio(waveform: AudioWaveform): Promise<string> {
     // TODO: Dev 1 will connect this module to Android native ExecuTorch runtime later.
-    return this.module.transcribeAudio(audioPath);
+    return this.module.transcribeAudio(Array.from(waveform));
   }
 
   async retrievePatientContext(patientId: string, transcript: string): Promise<string> {

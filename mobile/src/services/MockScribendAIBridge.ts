@@ -1,10 +1,10 @@
 import type {SoapNote} from '../models/SoapNote';
-import type {ScribendAIBridge} from './ScribendAIBridge';
+import type {AudioWaveform, ScribendAIBridge} from './ScribendAIBridge';
 
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 export class MockScribendAIBridge implements ScribendAIBridge {
-  async transcribeAudio(_audioPath: string): Promise<string> {
+  async transcribeAudio(_waveform: AudioWaveform): Promise<string> {
     await delay(700);
     return 'Patient reports headache and dizziness for 2 days. Mild fever last night. Good appetite.';
   }

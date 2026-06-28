@@ -1,4 +1,5 @@
 import React, {createContext, useContext, useMemo, useRef, useState} from 'react';
+import {audioCapture} from '../ai/AudioCapture';
 import {ScribendCopy} from '../copy/ScribendCopy';
 import {mockSavedVisits} from '../data/mockVisits';
 import type {Patient} from '../models/Patient';
@@ -35,6 +36,8 @@ export const VisitStoreProvider = ({children}: {children: React.ReactNode}) => {
   const [savedVisits, setSavedVisits] = useState<SavedVisitNote[]>(mockSavedVisits);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerSecondsRef = useRef(0);
+  // Mic samples captured for the current recording, fed to Whisper on stop.
+  const waveformRef = useRef<Float32Array>(new Float32Array(0));
 
   const stopTimer = () => {
     if (timerRef.current) {
@@ -61,6 +64,11 @@ export const VisitStoreProvider = ({children}: {children: React.ReactNode}) => {
         }
         timerSecondsRef.current = 0;
         stopTimer();
+        try {
+          audioCapture.start(); // begin live mic capture for Whisper
+        } catch (err) {
+          console.log('[Scribend] audio capture failed to start', err);
+        }
         timerRef.current = setInterval(() => {
           timerSecondsRef.current += 1;
           setCurrentVisit(ticking => ({...ticking, timerSeconds: timerSecondsRef.current}));
@@ -78,7 +86,7 @@ export const VisitStoreProvider = ({children}: {children: React.ReactNode}) => {
 
       try {
         setStatus('Transcribing');
-        const transcript = await aiBridge.transcribeAudio('local-demo-audio.wav');
+        const transcript = await aiBridge.transcribeAudio(waveformRef.current);
         if (!transcript.trim()) {
           throw new Error(ScribendCopy.TRANSCRIPT_EMPTY);
         }
@@ -123,6 +131,13 @@ export const VisitStoreProvider = ({children}: {children: React.ReactNode}) => {
         return undefined;
       }
       stopTimer();
+      // Stop the mic and keep the captured waveform for Whisper.
+      try {
+        waveformRef.current = audioCapture.stop();
+      } catch (err) {
+        console.log('[Scribend] audio capture failed to stop', err);
+        waveformRef.current = new Float32Array(0);
+      }
       if (timerSecondsRef.current < 3) {
         setCurrentVisit(current => ({
           ...current,

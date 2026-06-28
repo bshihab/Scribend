@@ -4,11 +4,14 @@ import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
 
 import android.app.Application;
+import com.facebook.hermes.reactexecutor.HermesExecutorFactory;
+import com.facebook.hermes.reactexecutor.RuntimeConfig;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactHost;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
+import com.facebook.react.bridge.JavaScriptExecutorFactory;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactHost;
 import com.facebook.react.defaults.DefaultReactNativeHost;
@@ -42,6 +45,16 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected Boolean isHermesEnabled() {
       return BuildConfig.IS_HERMES_ENABLED;
+    }
+
+    // On-device Whisper + Llama load large models whose JS-side allocations blow
+    // Hermes' default heap cap (intermittent "OOM: Max heap size was exceeded").
+    // Raise the Hermes heap so both models can coexist during a visit.
+    @Override
+    protected JavaScriptExecutorFactory getJavaScriptExecutorFactory() {
+      RuntimeConfig config = new RuntimeConfig();
+      config.setHeapSizeMB(6144);
+      return new HermesExecutorFactory(config);
     }
   });
 
