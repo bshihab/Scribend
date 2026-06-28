@@ -12,6 +12,8 @@ if [ -n "$_qnn_envsetup" ]; then
   export QNN_SDK_ROOT="$(dirname "$(dirname "$_qnn_envsetup")")"
   # shellcheck disable=SC1090
   source "$QNN_SDK_ROOT/bin/envsetup.sh" >/dev/null 2>&1
+  # The AOT export/lowering needs the QNN host (x86) libs on the library path.
+  export LD_LIBRARY_PATH="$QNN_SDK_ROOT/lib/x86_64-linux-clang:${LD_LIBRARY_PATH:-}"
 fi
 
 export PYTHONPATH="$EXECUTORCH_ROOT/..:$PYTHONPATH"
