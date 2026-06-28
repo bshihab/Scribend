@@ -1,5 +1,5 @@
 module.exports = {
-  presets: ['module:@react-native/babel-preset'],
-  // executorch's dep (zod v4) uses `export * as ns` — Metro's preset needs this to bundle it.
-  plugins: ['@babel/plugin-transform-export-namespace-from'],
+  // Expo-integrated app (executorch needs expo-modules-core). babel-preset-expo
+  // wraps the RN preset and handles the zod `export * as ns` case too.
+  presets: ['babel-preset-expo'],
 };
