@@ -65,15 +65,18 @@ class ScribendAgent:
         inputs = self.llama_tokenizer([text], return_tensors="pt").to("mps")
         
         # Generate the JSON output
-        outputs = self.llama_model.generate(**inputs, max_new_tokens=400, temperature=0.1)
-        response = self.llama_tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
+        outputs = self.llama_model.generate(**inputs, max_new_tokens=600, temperature=0.1)
         
-        # Extract the JSON block
+        # Only decode the NEWly generated tokens (ignore the prompt)
+        generated_ids = outputs[0][inputs.input_ids.shape[-1]:]
+        response = self.llama_tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
+        
+        # Extract the JSON block from the new response
         json_match = re.search(r'\{.*\}', response, re.DOTALL)
         if json_match:
             final_note = json_match.group(0)
         else:
-            final_note = response.split("assistant\n")[-1]
+            final_note = response
             
         return final_note
 
