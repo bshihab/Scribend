@@ -1,19 +1,20 @@
 // On-device AI pipeline for Scribend: audio -> Whisper transcript -> Llama SOAP note.
-// Runs entirely on-device (CPU/XNNPACK) via react-native-executorch.
+// Runs entirely on-device (CPU/XNNPACK) via react-native-executorch (v0.5.x API).
 //
 // Usage in a screen:
 //   const ai = useScribendAI();
-//   if (!ai.isReady) // show "loading models..."
+//   if (!ai.isReady) // show "loading models..." (first run downloads them)
 //   const { transcript, soap } = await ai.generateSoapFromAudio(audioUri);
-import { useLLM, useSpeechToText, models, type Message } from 'react-native-executorch';
+import {
+  useLLM,
+  useSpeechToText,
+  LLAMA3_2_3B_QLORA,
+  WHISPER_SMALL_EN,
+  type Message,
+} from 'react-native-executorch';
 import { SOAP_SYSTEM_PROMPT } from './systemPrompt';
 import { loadWaveform } from './audio';
 import { fallbackSoapNote, type SoapNote } from '../models/SoapNote';
-
-// ⚠️ VERIFY the exact model constant name against `models.llm.` autocomplete.
-// software-mansion publishes Llama 3.2 1B/3B (QLoRA recommended for speed).
-// If 3B is too heavy on the device, switch to the 1B constant.
-const LLM_MODEL = models.llm.llama3_2_3B_qlora; // e.g. ...llama3_2_1B_qlora for the smaller one
 
 export interface ScribendResult {
   transcript: string;
@@ -21,14 +22,20 @@ export interface ScribendResult {
 }
 
 export function useScribendAI() {
-  const stt = useSpeechToText({ modelName: 'whisper' }); // whisper-tiny (English ok)
-  const llm = useLLM({ model: LLM_MODEL() });
+  // Whisper small (English) — the model the team chose. Swap to WHISPER_TINY_EN
+  // for a smaller/faster download if needed.
+  const stt = useSpeechToText({ model: WHISPER_SMALL_EN });
+
+  // Llama 3.2 3B, QLoRA 4-bit (recommended by software-mansion for speed).
+  // The constant already bundles modelSource + tokenizerSource + tokenizerConfigSource.
+  // Drop to LLAMA3_2_1B_QLORA if 3B is too heavy on-device.
+  const llm = useLLM({ model: LLAMA3_2_3B_QLORA });
 
   const isReady = stt.isReady && llm.isReady;
   const isBusy = stt.isGenerating || llm.isGenerating;
 
   async function generateSoapFromAudio(audioUri: string): Promise<ScribendResult> {
-    // 1. Audio -> waveform -> transcript (Whisper)
+    // 1. Audio file -> 16 kHz waveform -> transcript (Whisper)
     const waveform = await loadWaveform(audioUri);
     const transcript = await stt.transcribe(waveform);
 
@@ -48,7 +55,10 @@ export function useScribendAI() {
     isReady,
     isBusy,
     error: stt.error ?? llm.error,
-    downloadProgress: { stt: stt.downloadProgress, llm: llm.downloadProgress },
+    downloadProgress: {
+      whisper: stt.downloadProgress,
+      llama: llm.downloadProgress,
+    },
     generateSoapFromAudio,
   };
 }
