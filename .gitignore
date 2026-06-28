@@ -22,3 +22,23 @@ venv/
 *.njsproj
 *.sln
 *.sw?
+
+# Android/Gradle
+.gradle/
+build/
+app/build/
+local.properties
+captures/
+*.apk
+*.aab
+
+# Local Android / React Native
+node_modules/
+android/local.properties
+android/.gradle/
+android/build/
+android/app/build/
+*.log
+.DS_Store
+.env
+.env.*

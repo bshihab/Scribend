@@ -1,0 +1,40 @@
+{
+  "name": "Scribend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "start": "react-native start",
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "lint:offline": "node scripts/check-offline-constraints.js"
+  },
+  "dependencies": {
+    "@react-navigation/native": "6.1.18",
+    "@react-navigation/native-stack": "6.11.0",
+    "react": "18.3.1",
+    "react-native": "0.76.5",
+    "react-native-safe-area-context": "4.12.0",
+    "react-native-screens": "4.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "7.26.0",
+    "@babel/preset-env": "7.26.0",
+    "@react-native/babel-preset": "0.76.5",
+    "@react-native-community/cli": "15.0.1",
+    "@react-native-community/cli-platform-android": "15.0.1",
+    "@react-native/metro-config": "0.76.5",
+    "@react-native/typescript-config": "0.76.5",
+    "@testing-library/react-native": "12.8.1",
+    "@types/jest": "29.5.14",
+    "@types/react": "18.3.12",
+    "@types/react-test-renderer": "18.3.0",
+    "babel-jest": "29.7.0",
+    "jest": "29.7.0",
+    "react-test-renderer": "18.3.1",
+    "typescript": "5.6.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
