@@ -8,7 +8,7 @@
 // - retrievePatientContext is a stub (sqlite-vec not wired into RN yet).
 import {
   LLMModule,
-  LLAMA3_2_1B_QLORA, // 1B for a fast first run; switch to LLAMA3_2_3B_QLORA for quality
+  LLAMA3_2_3B_QLORA, // 3B for note quality (the 1B echoed the prompt template)
   type Message,
 } from 'react-native-executorch';
 import {SOAP_SYSTEM_PROMPT} from '../ai/systemPrompt';
@@ -26,7 +26,7 @@ export class ExecutorchAIBridge implements ScribendAIBridge {
   // Load (and download on first run) the model exactly once.
   private ensureLoaded(): Promise<void> {
     if (!this.loadPromise) {
-      this.loadPromise = this.llm.load(LLAMA3_2_1B_QLORA, p =>
+      this.loadPromise = this.llm.load(LLAMA3_2_3B_QLORA, p =>
         console.log(`[Scribend] Llama download: ${Math.round(p * 100)}%`),
       );
     }
