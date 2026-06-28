@@ -14,6 +14,7 @@ from transformers import WhisperProcessor, WhisperForConditionalGeneration
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from scribend.system_prompt import SCRIBE_SYSTEM_PROMPT
 from scribend.tools.patient_history_tool import get_patient_history
+from scribend.medical_vocabulary import MEDICAL_VOCABULARY_PROMPT
 
 class ScribendAgent:
     def __init__(self):
@@ -34,11 +35,17 @@ class ScribendAgent:
         print("Agent is fully loaded and ready!")
 
     def transcribe_audio(self, audio_path: str) -> str:
-        """Step 1: Convert doctor's voice to text"""
+        """Step 1: Convert doctor's voice to text with medical vocabulary hint"""
         print("\n[1/3] Transcribing audio with Whisper...")
         audio, sr = librosa.load(audio_path, sr=16000)
         input_features = self.whisper_processor(audio, sampling_rate=sr, return_tensors="pt").input_features
-        predicted_ids = self.whisper_model.generate(input_features)
+        
+        # Feed the medical vocabulary as an initial_prompt to bias Whisper
+        # toward recognizing complex medical terms correctly
+        prompt_ids = self.whisper_processor.get_prompt_ids(
+            MEDICAL_VOCABULARY_PROMPT, return_tensors="pt"
+        )
+        predicted_ids = self.whisper_model.generate(input_features, prompt_ids=prompt_ids)
         transcript = self.whisper_processor.batch_decode(predicted_ids, skip_special_tokens=True)[0].strip()
         print(f"Transcript: \"{transcript}\"")
         return transcript
