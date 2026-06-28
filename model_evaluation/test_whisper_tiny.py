@@ -3,8 +3,10 @@ import torch
 import librosa
 from transformers import WhisperProcessor, WhisperForConditionalGeneration
 
+import sys
+
 MODEL_NAME = "openai/whisper-tiny.en"
-AUDIO_PATH = "model_evaluation/test_medical.wav"
+AUDIO_PATH = sys.argv[1] if len(sys.argv) > 1 else "model_evaluation/my_voice.wav"
 
 def test_whisper():
     print(f"Loading {MODEL_NAME}...")

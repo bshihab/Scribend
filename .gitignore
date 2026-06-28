@@ -33,3 +33,4 @@ dev3_sample_vectors.json
 *.sln
 *.sw?
 dev3_final_test.json
+*.wav

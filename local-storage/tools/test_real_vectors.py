@@ -77,7 +77,7 @@ def main():
     records = load_json_records(sys.argv[1])
     validate(records)
 
-    import sqlite3
+    import sqlean as sqlite3
     import sqlite_vec
     db = sqlite3.connect(":memory:")
     db.enable_load_extension(True)
